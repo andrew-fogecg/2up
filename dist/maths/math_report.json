@@ -1,0 +1,44 @@
+{
+  "game": "Stake Game Template Blueprint",
+  "mechanic_profile": {
+    "key": "reel-line",
+    "title": "Reel Spin Line Wins",
+    "board_layout": "5x3 reels",
+    "win_conditions": [
+      "3 or more matching symbols on adjacent reels award wins."
+    ],
+    "bonus_features": [
+      "Wild W substitutes and Scatter SC can trigger feature messaging."
+    ],
+    "notes": [
+      "Template-driven reel engine",
+      "Supports line-win style content generation"
+    ]
+  },
+  "mode_rtp_variance": 0.0046,
+  "variance_tolerance": 0.005,
+  "configuration_compliant": true,
+  "mode_reports": [
+    {
+      "name": "base",
+      "cost": 1.0,
+      "target_rtp": 0.94,
+      "estimated_rtp": 0.9404,
+      "delta_from_target": 0.0004,
+      "max_win_multiplier": 5000,
+      "max_win_hit_rate": 5e-08,
+      "compliant": true
+    },
+    {
+      "name": "bonus",
+      "cost": 2.0,
+      "target_rtp": 0.9440000000000001,
+      "estimated_rtp": 0.945,
+      "delta_from_target": 0.001,
+      "max_win_multiplier": 8000,
+      "max_win_hit_rate": 4e-08,
+      "compliant": true
+    }
+  ],
+  "disclaimer_present": true
+}

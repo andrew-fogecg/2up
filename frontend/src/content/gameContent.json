@@ -1,0 +1,55 @@
+{
+  "gameName": "Pickup 52 Labs",
+  "tagline": "A blueprint-driven Stake game shell with real build outputs, compliance-aware copy, and reusable review artifacts.",
+  "iconConcept": "A chromed card fan embedded in a signal grid, pairing casino cadence with engineering structure.",
+  "board": {
+    "layout": "5x3 reel board",
+    "primaryAction": "SPIN",
+    "secondaryAction": "AUTO PLAY",
+    "summary": "The board is centered around a 5x3 reel frame with visible action states, payout feedback, and a rules drawer that stays accessible on compact layouts."
+  },
+  "buttonLabels": {
+    "standard": {
+      "primary": "SPIN",
+      "amount": "BET AMOUNT",
+      "auto": "AUTO BET",
+      "history": "ROUND HISTORY"
+    },
+    "social": {
+      "primary": "PLAY",
+      "amount": "PLAY AMOUNT",
+      "auto": "AUTO PLAY",
+      "history": "ROUND HISTORY"
+    }
+  },
+  "helpSections": [
+    {
+      "title": "Game Flow",
+      "body": "Set the play amount, trigger the primary action with the main button or spacebar, and review results in the round history tray."
+    },
+    {
+      "title": "Social Mode Copy",
+      "body": "When social mode is active, the interface switches to PLAY wording, removes dollar symbols, and shows balances with GC or SC labels only."
+    },
+    {
+      "title": "Replay Support",
+      "body": "The replay shell reads session, nonce, social, currency, and rgs_url query parameters so a reviewed round can be reconstructed from a shared link."
+    },
+    {
+      "title": "Audio Hooks",
+      "body": "Small win, big win, scatter land, and reel spin events each expose mute and volume controls through the settings tray."
+    }
+  ],
+  "socialModeCopy": {
+    "summary": "Social mode never uses restricted real-money wording and presents balances as GC or SC instead of dollar-denominated amounts.",
+    "currencyLabels": ["GC", "SC"],
+    "bannedWords": ["bet", "wager", "buy", "payout", "gambling"]
+  },
+  "qaChecks": [
+    "Spacebar triggers the primary action only when no modal is open.",
+    "Replay mode honors all shared URL parameters.",
+    "Social mode switches labels and removes dollar signs.",
+    "Help content includes disclaimer and control guidance."
+  ],
+  "disclaimer": "Malfunction voids all pays and plays. A consistent internet connection is required. In the event of a disconnection, reload the game to finish any uncompleted rounds. The expected return is calculated over many rounds. Animations are not representative of any physical device, and are for illustrative purposes only. TM and © 2026 Stake Engine."
+}

@@ -1,0 +1,10 @@
+{
+  "agent": "qa-tester",
+  "status": "passed",
+  "summary": "Executed automated QA checks for spacebar binding, replay parameters, disclaimer text, and social-mode wording.",
+  "issues": [],
+  "artifacts": [
+    "dist/submission/system/qa_report.json",
+    "dist/submission/system/frontend_test_report.json"
+  ]
+}

@@ -1,0 +1,47 @@
+[
+  {
+    "file": ".github/agents/director.agent",
+    "declared_name": "StakeDirector",
+    "expected_name": "StakeDirector"
+  },
+  {
+    "file": ".github/agents/concept-artist.agent.md",
+    "declared_name": "concept-artist",
+    "expected_name": "concept-artist"
+  },
+  {
+    "file": ".github/agents/stake-developer.agent.md",
+    "declared_name": "stake-developer",
+    "expected_name": "stake-developer"
+  },
+  {
+    "file": ".github/agents/ui-developer.agent.md",
+    "declared_name": "ui-developer",
+    "expected_name": "ui-developer"
+  },
+  {
+    "file": ".github/agents/sound-engineer.agent.md",
+    "declared_name": "sound-engineer",
+    "expected_name": "sound-engineer"
+  },
+  {
+    "file": ".github/agents/qa-tester.agent.md",
+    "declared_name": "qa-tester",
+    "expected_name": "qa-tester"
+  },
+  {
+    "file": ".github/agents/content-writer.agent.md",
+    "declared_name": "content-writer",
+    "expected_name": "content-writer"
+  },
+  {
+    "file": ".github/agents/devops.agent.md",
+    "declared_name": "devops-agent",
+    "expected_name": "devops-agent"
+  },
+  {
+    "file": ".github/agents/stake-assures.agent.md",
+    "declared_name": "stake-assures",
+    "expected_name": "stake-assures"
+  }
+]

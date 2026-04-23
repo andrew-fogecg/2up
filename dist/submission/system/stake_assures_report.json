@@ -1,0 +1,6 @@
+{
+  "status": "passed",
+  "mode_rtp_variance": 0.0046,
+  "variance_tolerance": 0.005,
+  "issues": []
+}

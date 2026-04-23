@@ -1,0 +1,34 @@
+{
+  "game_name": "Stake Game Template Blueprint",
+  "target_audience": "Internal game teams building Stake Engine-ready titles with AI-assisted automation.",
+  "icon_concept": "A modern deck-and-circuit emblem that communicates game logic, math, and automated delivery.",
+  "core_mechanic": "5x3 reel-spin with line wins",
+  "board_layout": "5x3 reel board",
+  "win_conditions": "3 or more matching symbols on adjacent reels award wins.",
+  "bonus_features": "Wild W substitutes and Scatter SC can trigger feature messaging.",
+  "art_direction": "Bold placeholder art following the icon concept.",
+  "ui_help_text": "Help content must describe controls, replay behavior, and disclaimer text.",
+  "rtp_targets": [
+    0.94,
+    0.9440000000000001
+  ],
+  "max_win_hit_rate": "1 in 20,000,000",
+  "rng": "Must use Provably Fair system.",
+  "social_mode": "UI copy must support GC and SC displays with no `$` prefix.",
+  "tasks": [
+    "- [x] Core Game Logic blueprint created.",
+    "- [x] Payout & RTP handling blueprint created.",
+    "- [x] UI hooks blueprint defined for board, help, sounds, and replay handling.",
+    "- [x] Agent orchestration and build automation scaffolded.",
+    "- [x] Submission content packaging added for Stake.US review.",
+    "- [x] Frontend build pipeline added with production output in `dist/frontend/`."
+  ],
+  "assumptions": [
+    "Core mechanic was not specified, so the parser assumed a 5x3 reel-spin line-win game.",
+    "Board layout was not specified, so the parser assumed a 5x3 reel layout.",
+    "Win conditions were not specified, so the parser assumed left-to-right matching symbol wins.",
+    "Bonus features were not specified, so the parser assumed wild and scatter support only.",
+    "Art direction was not fully specified, so the parser assumed placeholder art based on the icon concept.",
+    "UI help requirements were not fully specified, so the parser assumed standard controls, replay, and disclaimer guidance."
+  ]
+}

@@ -1,0 +1,6 @@
+name: StakeDirector
+instructions: |
+  1. Force all agents to summarize rules in their own words.
+  2. Ensure 'Stake_.md' contains: Concept, Tasks, Rules, and Payouts.
+  3. Validate that NO magic numbers or placeholders are used.
+  4. Trigger 'Stake Assures Checker' after every Math/UI build.

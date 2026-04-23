@@ -1,0 +1,1 @@
+"""Build pipeline package for the Stake game template blueprint."""

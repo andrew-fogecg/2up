@@ -1,0 +1,215 @@
+{
+  "status": "passed",
+  "issue_count": 0,
+  "issues": [],
+  "open_blockers": [],
+  "artifacts": {
+    "agent_inventory": "dist/submission/system/agent_inventory.json",
+    "math_report": "dist/maths/math_report.json",
+    "frontend_bundle": "dist/frontend/index.html",
+    "requirements_audit": "dist/submission/requirements_audit.md",
+    "action_summary": "dist/submission/action_summary.md",
+    "stake_us_submission": "dist/submission/stake_us_submission.md",
+    "release_package": "dist/submission/releases/stake-game-template-artifacts.zip",
+    "director_report": "dist/submission/system/director_report.md",
+    "generated_spec": "dist/submission/generated_spec.md",
+    "game_spec_json": "dist/submission/spec/game_spec.json",
+    "assumptions_draft": "dist/submission/assumptions_draft.md",
+    "art_manifest": "frontend/src/content/generatedArtManifest.json"
+  },
+  "orchestration_order": [
+    "concept-artist",
+    "stake-developer",
+    "ui-developer",
+    "sound-engineer",
+    "qa-tester",
+    "stake-assures",
+    "content-writer",
+    "devops-agent",
+    "StakeDirector"
+  ],
+  "agent_results": [
+    {
+      "agent": "concept-artist",
+      "status": "passed",
+      "summary": "Expanded the concept into a brief covering name, icon, board layout, and symbol hierarchy.",
+      "issues": [],
+      "artifacts": [
+        "dist/submission/docs/concept_brief.md",
+        "dist/submission/generated_spec.md",
+        "dist/submission/assumptions_draft.md"
+      ]
+    },
+    {
+      "agent": "stake-developer",
+      "status": "passed",
+      "summary": "Validated and exported the configured math profile and first-pass mechanic engine description.",
+      "issues": [],
+      "artifacts": [
+        "dist/maths/math_report.json",
+        "dist/maths/developer_summary.md",
+        "math/generated_game_config.json"
+      ]
+    },
+    {
+      "agent": "ui-developer",
+      "status": "passed",
+      "summary": "Built the frontend shell against generated content, generated assumptions, and the art manifest.",
+      "issues": [],
+      "artifacts": [
+        "dist/frontend/index.html",
+        "dist/frontend/ui_summary.md",
+        "frontend/src/content/generatedGameContent.json",
+        "frontend/src/content/generatedArtManifest.json"
+      ]
+    },
+    {
+      "agent": "sound-engineer",
+      "status": "passed",
+      "summary": "Generated the sound map required by the build-system PDF and linked mute/volume hooks.",
+      "issues": [],
+      "artifacts": [
+        "dist/submission/docs/sound_map.json",
+        "frontend/public/assets/generated/stake-game-template-blueprint/icon.svg",
+        "frontend/public/assets/generated/stake-game-template-blueprint/symbol-l1.svg",
+        "frontend/public/assets/generated/stake-game-template-blueprint/symbol-l2.svg",
+        "frontend/public/assets/generated/stake-game-template-blueprint/symbol-h1.svg",
+        "frontend/public/assets/generated/stake-game-template-blueprint/symbol-h2.svg",
+        "frontend/public/assets/generated/stake-game-template-blueprint/symbol-w.svg",
+        "frontend/public/assets/generated/stake-game-template-blueprint/symbol-sc.svg"
+      ]
+    },
+    {
+      "agent": "qa-tester",
+      "status": "passed",
+      "summary": "Executed automated QA checks for spacebar binding, replay parameters, disclaimer text, and social-mode wording.",
+      "issues": [],
+      "artifacts": [
+        "dist/submission/system/qa_report.json",
+        "dist/submission/system/frontend_test_report.json"
+      ]
+    },
+    {
+      "agent": "stake-assures",
+      "status": "passed",
+      "summary": "Ran Stake compliance review across math, social-mode wording, and RNG documentation.",
+      "issues": [],
+      "artifacts": [
+        "dist/submission/system/stake_assures_report.json"
+      ]
+    },
+    {
+      "agent": "content-writer",
+      "status": "passed",
+      "summary": "Compiled the Stake.US submission draft from concept, UI, math, QA, and compliance inputs.",
+      "issues": [],
+      "artifacts": [
+        "dist/submission/stake_us_submission.md"
+      ]
+    },
+    {
+      "agent": "devops-agent",
+      "status": "passed",
+      "summary": "Packaged the generated artifacts into a review-ready release archive.",
+      "issues": [],
+      "artifacts": [
+        "dist/submission/releases/stake-game-template-artifacts.zip"
+      ]
+    },
+    {
+      "agent": "StakeDirector",
+      "status": "passed",
+      "summary": "Reviewed the full orchestrated run, validated agent outputs, and prepared the final status report.",
+      "issues": [],
+      "artifacts": [
+        "dist/submission/system/director_report.md"
+      ]
+    }
+  ],
+  "frontend": {
+    "built": true,
+    "artifact": "dist/frontend/index.html",
+    "build_output": "> stake-game-template-frontend@0.1.0 build\n> vite build\n\nvite v7.3.2 building client environment for production...\ntransforming...\n\u2713 8 modules transformed.\nrendering chunks...\ncomputing gzip size...\n../dist/frontend/index.html                 0.71 kB \u2502 gzip: 0.40 kB\n../dist/frontend/assets/index-BQpoCfAv.css  3.83 kB \u2502 gzip: 1.52 kB\n../dist/frontend/assets/index-BIys4W6V.js   9.24 kB \u2502 gzip: 3.27 kB\n\u2713 built in 57ms"
+  },
+  "parser": {
+    "parsed": {
+      "game_name": "Stake Game Template Blueprint",
+      "target_audience": "Internal game teams building Stake Engine-ready titles with AI-assisted automation.",
+      "icon_concept": "A modern deck-and-circuit emblem that communicates game logic, math, and automated delivery.",
+      "core_mechanic": "5x3 reel-spin with line wins"
+    },
+    "generated_paths": {
+      "game_config": "math/generated_game_config.json",
+      "frontend_content": "frontend/src/content/generatedGameContent.json",
+      "art_manifest": "frontend/src/content/generatedArtManifest.json",
+      "generated_spec": "dist/submission/generated_spec.md",
+      "game_spec_json": "dist/submission/spec/game_spec.json",
+      "assumptions_draft": "dist/submission/assumptions_draft.md"
+    },
+    "generated_assets": [
+      "frontend/public/assets/generated/stake-game-template-blueprint/icon.svg",
+      "frontend/public/assets/generated/stake-game-template-blueprint/symbol-l1.svg",
+      "frontend/public/assets/generated/stake-game-template-blueprint/symbol-l2.svg",
+      "frontend/public/assets/generated/stake-game-template-blueprint/symbol-h1.svg",
+      "frontend/public/assets/generated/stake-game-template-blueprint/symbol-h2.svg",
+      "frontend/public/assets/generated/stake-game-template-blueprint/symbol-w.svg",
+      "frontend/public/assets/generated/stake-game-template-blueprint/symbol-sc.svg"
+    ],
+    "art_pipeline": {
+      "manifest_path": "frontend/src/content/generatedArtManifest.json",
+      "mode": "placeholder",
+      "generated_assets": [
+        "frontend/public/assets/generated/stake-game-template-blueprint/icon.svg",
+        "frontend/public/assets/generated/stake-game-template-blueprint/symbol-l1.svg",
+        "frontend/public/assets/generated/stake-game-template-blueprint/symbol-l2.svg",
+        "frontend/public/assets/generated/stake-game-template-blueprint/symbol-h1.svg",
+        "frontend/public/assets/generated/stake-game-template-blueprint/symbol-h2.svg",
+        "frontend/public/assets/generated/stake-game-template-blueprint/symbol-w.svg",
+        "frontend/public/assets/generated/stake-game-template-blueprint/symbol-sc.svg"
+      ],
+      "active_assets": {
+        "icon": "/assets/generated/stake-game-template-blueprint/icon.svg",
+        "symbols": [
+          {
+            "key": "L1",
+            "label": "L1",
+            "src": "/assets/generated/stake-game-template-blueprint/symbol-l1.svg"
+          },
+          {
+            "key": "L2",
+            "label": "L2",
+            "src": "/assets/generated/stake-game-template-blueprint/symbol-l2.svg"
+          },
+          {
+            "key": "H1",
+            "label": "H1",
+            "src": "/assets/generated/stake-game-template-blueprint/symbol-h1.svg"
+          },
+          {
+            "key": "H2",
+            "label": "H2",
+            "src": "/assets/generated/stake-game-template-blueprint/symbol-h2.svg"
+          },
+          {
+            "key": "W",
+            "label": "W",
+            "src": "/assets/generated/stake-game-template-blueprint/symbol-w.svg"
+          },
+          {
+            "key": "SC",
+            "label": "SC",
+            "src": "/assets/generated/stake-game-template-blueprint/symbol-sc.svg"
+          }
+        ]
+      }
+    },
+    "assumptions": [
+      "Core mechanic was not specified, so the parser assumed a 5x3 reel-spin line-win game.",
+      "Board layout was not specified, so the parser assumed a 5x3 reel layout.",
+      "Win conditions were not specified, so the parser assumed left-to-right matching symbol wins.",
+      "Bonus features were not specified, so the parser assumed wild and scatter support only.",
+      "Art direction was not fully specified, so the parser assumed placeholder art based on the icon concept.",
+      "UI help requirements were not fully specified, so the parser assumed standard controls, replay, and disclaimer guidance."
+    ]
+  }
+}

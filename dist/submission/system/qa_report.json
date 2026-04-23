@@ -1,0 +1,23 @@
+{
+  "checks": [
+    "Spacebar triggers the primary action only when no modal is open.",
+    "Replay mode honors all shared URL parameters.",
+    "Social mode switches labels and removes dollar signs.",
+    "Help content includes disclaimer and control guidance."
+  ],
+  "issues": [],
+  "status": "passed",
+  "browser_tests": {
+    "passed": true,
+    "artifact": "dist/submission/system/frontend_test_report.json",
+    "test_output": "> stake-game-template-frontend@0.1.0 test:e2e\n> playwright test\n\n\nRunning 4 tests using 1 worker\n\n  \u2713  1 tests/app.spec.js:3:1 \u203a renders generated requirements-driven content (955ms)\n  \u2713  2 tests/app.spec.js:12:1 \u203a toggles into social mode copy (634ms)\n  \u2713  3 tests/app.spec.js:20:1 \u203a replay query parameters drive the UI context (554ms)\n  \u2713  4 tests/app.spec.js:28:1 \u203a spacebar triggers the primary action state (559ms)\n\n  4 passed (3.7s)"
+  },
+  "assumptions": [
+    "Core mechanic was not specified, so the parser assumed a 5x3 reel-spin line-win game.",
+    "Board layout was not specified, so the parser assumed a 5x3 reel layout.",
+    "Win conditions were not specified, so the parser assumed left-to-right matching symbol wins.",
+    "Bonus features were not specified, so the parser assumed wild and scatter support only.",
+    "Art direction was not fully specified, so the parser assumed placeholder art based on the icon concept.",
+    "UI help requirements were not fully specified, so the parser assumed standard controls, replay, and disclaimer guidance."
+  ]
+}

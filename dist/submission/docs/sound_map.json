@@ -1,0 +1,30 @@
+{
+  "small_win": {
+    "file": "assets/audio/small-win.ogg",
+    "hooks": [
+      "mute",
+      "volume"
+    ]
+  },
+  "big_win": {
+    "file": "assets/audio/big-win.ogg",
+    "hooks": [
+      "mute",
+      "volume"
+    ]
+  },
+  "scatter_land": {
+    "file": "assets/audio/scatter-land.ogg",
+    "hooks": [
+      "mute",
+      "volume"
+    ]
+  },
+  "reel_spin": {
+    "file": "assets/audio/reel-spin.ogg",
+    "hooks": [
+      "mute",
+      "volume"
+    ]
+  }
+}

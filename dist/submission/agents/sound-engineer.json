@@ -1,0 +1,16 @@
+{
+  "agent": "sound-engineer",
+  "status": "passed",
+  "summary": "Generated the sound map required by the build-system PDF and linked mute/volume hooks.",
+  "issues": [],
+  "artifacts": [
+    "dist/submission/docs/sound_map.json",
+    "frontend/public/assets/generated/stake-game-template-blueprint/icon.svg",
+    "frontend/public/assets/generated/stake-game-template-blueprint/symbol-l1.svg",
+    "frontend/public/assets/generated/stake-game-template-blueprint/symbol-l2.svg",
+    "frontend/public/assets/generated/stake-game-template-blueprint/symbol-h1.svg",
+    "frontend/public/assets/generated/stake-game-template-blueprint/symbol-h2.svg",
+    "frontend/public/assets/generated/stake-game-template-blueprint/symbol-w.svg",
+    "frontend/public/assets/generated/stake-game-template-blueprint/symbol-sc.svg"
+  ]
+}

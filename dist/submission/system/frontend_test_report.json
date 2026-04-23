@@ -1,0 +1,5 @@
+{
+  "passed": true,
+  "artifact": "dist/submission/system/frontend_test_report.json",
+  "test_output": "> stake-game-template-frontend@0.1.0 test:e2e\n> playwright test\n\n\nRunning 4 tests using 1 worker\n\n  \u2713  1 tests/app.spec.js:3:1 \u203a renders generated requirements-driven content (955ms)\n  \u2713  2 tests/app.spec.js:12:1 \u203a toggles into social mode copy (634ms)\n  \u2713  3 tests/app.spec.js:20:1 \u203a replay query parameters drive the UI context (554ms)\n  \u2713  4 tests/app.spec.js:28:1 \u203a spacebar triggers the primary action state (559ms)\n\n  4 passed (3.7s)"
+}

@@ -1,0 +1,74 @@
+{
+  "mode": "placeholder",
+  "active": {
+    "icon": "/assets/generated/stake-game-template-blueprint/icon.svg",
+    "symbols": [
+      {
+        "key": "L1",
+        "label": "L1",
+        "src": "/assets/generated/stake-game-template-blueprint/symbol-l1.svg"
+      },
+      {
+        "key": "L2",
+        "label": "L2",
+        "src": "/assets/generated/stake-game-template-blueprint/symbol-l2.svg"
+      },
+      {
+        "key": "H1",
+        "label": "H1",
+        "src": "/assets/generated/stake-game-template-blueprint/symbol-h1.svg"
+      },
+      {
+        "key": "H2",
+        "label": "H2",
+        "src": "/assets/generated/stake-game-template-blueprint/symbol-h2.svg"
+      },
+      {
+        "key": "W",
+        "label": "W",
+        "src": "/assets/generated/stake-game-template-blueprint/symbol-w.svg"
+      },
+      {
+        "key": "SC",
+        "label": "SC",
+        "src": "/assets/generated/stake-game-template-blueprint/symbol-sc.svg"
+      }
+    ]
+  },
+  "placeholder": {
+    "icon": "/assets/generated/stake-game-template-blueprint/icon.svg",
+    "symbols": [
+      {
+        "key": "L1",
+        "label": "L1",
+        "src": "/assets/generated/stake-game-template-blueprint/symbol-l1.svg"
+      },
+      {
+        "key": "L2",
+        "label": "L2",
+        "src": "/assets/generated/stake-game-template-blueprint/symbol-l2.svg"
+      },
+      {
+        "key": "H1",
+        "label": "H1",
+        "src": "/assets/generated/stake-game-template-blueprint/symbol-h1.svg"
+      },
+      {
+        "key": "H2",
+        "label": "H2",
+        "src": "/assets/generated/stake-game-template-blueprint/symbol-h2.svg"
+      },
+      {
+        "key": "W",
+        "label": "W",
+        "src": "/assets/generated/stake-game-template-blueprint/symbol-w.svg"
+      },
+      {
+        "key": "SC",
+        "label": "SC",
+        "src": "/assets/generated/stake-game-template-blueprint/symbol-sc.svg"
+      }
+    ]
+  },
+  "approved": null
+}

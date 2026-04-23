@@ -1,0 +1,9 @@
+{
+  "agent": "stake-assures",
+  "status": "passed",
+  "summary": "Ran Stake compliance review across math, social-mode wording, and RNG documentation.",
+  "issues": [],
+  "artifacts": [
+    "dist/submission/system/stake_assures_report.json"
+  ]
+}

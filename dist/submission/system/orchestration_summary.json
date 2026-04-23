@@ -1,0 +1,98 @@
+[
+  {
+    "agent": "concept-artist",
+    "status": "passed",
+    "summary": "Expanded the concept into a brief covering name, icon, board layout, and symbol hierarchy.",
+    "issues": [],
+    "artifacts": [
+      "dist/submission/docs/concept_brief.md",
+      "dist/submission/generated_spec.md",
+      "dist/submission/assumptions_draft.md"
+    ]
+  },
+  {
+    "agent": "stake-developer",
+    "status": "passed",
+    "summary": "Validated and exported the configured math profile and first-pass mechanic engine description.",
+    "issues": [],
+    "artifacts": [
+      "dist/maths/math_report.json",
+      "dist/maths/developer_summary.md",
+      "math/generated_game_config.json"
+    ]
+  },
+  {
+    "agent": "ui-developer",
+    "status": "passed",
+    "summary": "Built the frontend shell against generated content, generated assumptions, and the art manifest.",
+    "issues": [],
+    "artifacts": [
+      "dist/frontend/index.html",
+      "dist/frontend/ui_summary.md",
+      "frontend/src/content/generatedGameContent.json",
+      "frontend/src/content/generatedArtManifest.json"
+    ]
+  },
+  {
+    "agent": "sound-engineer",
+    "status": "passed",
+    "summary": "Generated the sound map required by the build-system PDF and linked mute/volume hooks.",
+    "issues": [],
+    "artifacts": [
+      "dist/submission/docs/sound_map.json",
+      "frontend/public/assets/generated/stake-game-template-blueprint/icon.svg",
+      "frontend/public/assets/generated/stake-game-template-blueprint/symbol-l1.svg",
+      "frontend/public/assets/generated/stake-game-template-blueprint/symbol-l2.svg",
+      "frontend/public/assets/generated/stake-game-template-blueprint/symbol-h1.svg",
+      "frontend/public/assets/generated/stake-game-template-blueprint/symbol-h2.svg",
+      "frontend/public/assets/generated/stake-game-template-blueprint/symbol-w.svg",
+      "frontend/public/assets/generated/stake-game-template-blueprint/symbol-sc.svg"
+    ]
+  },
+  {
+    "agent": "qa-tester",
+    "status": "passed",
+    "summary": "Executed automated QA checks for spacebar binding, replay parameters, disclaimer text, and social-mode wording.",
+    "issues": [],
+    "artifacts": [
+      "dist/submission/system/qa_report.json",
+      "dist/submission/system/frontend_test_report.json"
+    ]
+  },
+  {
+    "agent": "stake-assures",
+    "status": "passed",
+    "summary": "Ran Stake compliance review across math, social-mode wording, and RNG documentation.",
+    "issues": [],
+    "artifacts": [
+      "dist/submission/system/stake_assures_report.json"
+    ]
+  },
+  {
+    "agent": "content-writer",
+    "status": "passed",
+    "summary": "Compiled the Stake.US submission draft from concept, UI, math, QA, and compliance inputs.",
+    "issues": [],
+    "artifacts": [
+      "dist/submission/stake_us_submission.md"
+    ]
+  },
+  {
+    "agent": "devops-agent",
+    "status": "passed",
+    "summary": "Packaged the generated artifacts into a review-ready release archive.",
+    "issues": [],
+    "artifacts": [
+      "dist/submission/releases/stake-game-template-artifacts.zip"
+    ]
+  },
+  {
+    "agent": "StakeDirector",
+    "status": "passed",
+    "summary": "Reviewed the full orchestrated run, validated agent outputs, and prepared the final status report.",
+    "issues": [],
+    "artifacts": [
+      "dist/submission/system/director_report.md"
+    ]
+  }
+]

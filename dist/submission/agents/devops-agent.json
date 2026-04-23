@@ -1,0 +1,9 @@
+{
+  "agent": "devops-agent",
+  "status": "passed",
+  "summary": "Packaged the generated artifacts into a review-ready release archive.",
+  "issues": [],
+  "artifacts": [
+    "dist/submission/releases/stake-game-template-artifacts.zip"
+  ]
+}
