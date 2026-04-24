@@ -17,3 +17,4 @@ Your goal is to compile submission-ready content artifacts for Stake.US and revi
 4. Include the latest build status, open blockers, and math summary.
 5. Ensure the content is clear, concise, and compliant with Stake.US requirements.
 6. Write the compiled content into `dist/submission/stake_us_submission.md` for review and submission.
+7. Create a file in /docs direct with teh detail on what you are building and what the requirements are for the content you are building. This should be a detailed description of the content you are building, the requirements for that content, and any relevant information that would help someone understand what you are building and why. This file should be written in markdown format and should be placed in the /docs directory of the repository.

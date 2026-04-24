@@ -41,6 +41,49 @@ The repository includes the main agent roles below.
 | `.github/agents/devops.agent.md` | Packages deployable output and publication steps | Present |
 | `.github/agents/stake-assures.agent.md` | Compliance and approval checklist | Present |
 
+## Running the Game Locally
+
+The game is a Vite-powered frontend located in `frontend/`.
+
+### Prerequisites
+
+- Node.js 18+
+- npm
+
+### Install dependencies
+
+```bash
+cd frontend
+npm install
+```
+
+### Start the dev server
+
+```bash
+npm run dev
+```
+
+The game will be available at **http://localhost:5173** (or the next free port Vite selects).
+
+URL parameters supported:
+| Param | Example | Description |
+|---|---|---|
+| `currency` | `?currency=GC` | Currency mode — `GC`, `SC`, `USD`, etc. Defaults to `GC` |
+| `balance` | `?balance=5000` | Starting balance in display units. Defaults to `1000` |
+| `social` | `?social=1` | Enable social (free-to-play) mode |
+
+Example: `http://localhost:5173?currency=SC&balance=2500`
+
+### Build for production
+
+```bash
+npm run build
+```
+
+Output is written to `../dist/frontend/`.
+
+---
+
 ## How To Trigger The System
 
 The repository now supports both a local trigger and a CI trigger.

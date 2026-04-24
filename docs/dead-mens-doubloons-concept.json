@@ -1,0 +1,532 @@
+{
+  "conceptDocument": {
+    "version": "1.0.0",
+    "createdBy": "Stake Concept Artist",
+    "createdDate": "2026-04-24",
+    "sourceDocument": "docs/2up.md",
+    "complianceRef": "docs/Stake_.md"
+  },
+
+  "gameIdentity": {
+    "officialName": "Dead Men's Doubloons",
+    "tagline": "Come in, Spinner — if ye dare.",
+    "genre": "Skill-style coin-toss / Two-Up",
+    "engine": "Stake Engine",
+    "alternativeNames": [
+      "Doubloons of Davy Jones",
+      "Skull & Kip",
+      "The Pirate's Toss"
+    ],
+    "iconConcept": {
+      "description": "A single gold doubloon tilted at 15 degrees, skull-side facing forward. The skull wears a tarnished iron crown. Rim serrations catch torch-light. Background: black with radial amber glow. Dimensions: 512×512px. Export formats: PNG @1x/2x/3x, SVG for web.",
+      "primaryColour": "#FFD700",
+      "glowColour": "#C8860A",
+      "backgroundColour": "#0D1B2A"
+    }
+  },
+
+  "colourPalette": {
+    "source": "docs/2up.md — Visual Design System",
+    "tokens": {
+      "treasure-gold":  { "hex": "#FFD700", "usage": "Coin faces, win banners, title highlights, CTA borders" },
+      "doubloon-amber": { "hex": "#C8860A", "usage": "Coin rim gradient, torch halos, secondary accents" },
+      "dark-oak":       { "hex": "#2C1A0E", "usage": "Kip plank, panel backgrounds, footer bar" },
+      "sea-shadow":     { "hex": "#0D1B2A", "usage": "Page background, cavern deep-shadow, vignette overlay" },
+      "torch-orange":   { "hex": "#FF6B2B", "usage": "Torch flame, hot-state button fill, OddingOut flicker" },
+      "fog-white":      { "hex": "#F5ECD7", "usage": "Body text, parchment textures, result label backgrounds" },
+      "blood-red":      { "hex": "#8B0000", "usage": "Loss state banners, OddsTracker danger indicator, Barred call" },
+      "kelp-green":     { "hex": "#2D5016", "usage": "Win state border glow, Ringie confirm badge, bet confirmed chip" }
+    },
+    "cssCustomProperties": ":root { --treasure-gold: #FFD700; --doubloon-amber: #C8860A; --dark-oak: #2C1A0E; --sea-shadow: #0D1B2A; --torch-orange: #FF6B2B; --fog-white: #F5ECD7; --blood-red: #8B0000; --kelp-green: #2D5016; }"
+  },
+
+  "coinSymbolDesign": {
+    "sharedSpecs": {
+      "diameter": 120,
+      "diameterUnit": "px",
+      "thickness": 12,
+      "thicknessUnit": "px",
+      "rimWidth": 8,
+      "rimWidthUnit": "px",
+      "rimSerrations": 72,
+      "shadowBlur": 24,
+      "shadowOffsetY": 8,
+      "shadowColour": "rgba(0,0,0,0.6)"
+    },
+    "gradients": {
+      "faceFront": "radial-gradient(circle at 38% 35%, #FFE566 0%, #FFD700 40%, #C8860A 75%, #8B6000 100%)",
+      "faceBack":  "radial-gradient(circle at 62% 65%, #D4AF37 0%, #C8860A 45%, #8B6000 80%, #5A3A00 100%)",
+      "rim":       "conic-gradient(from 0deg, #C8860A, #FFD700, #C8860A, #FFD700, #C8860A)"
+    },
+    "headsCoins": {
+      "label": "HEADS",
+      "labelFont": "'Pirata One', cursive",
+      "labelFontSize": "14px",
+      "labelColour": "#2C1A0E",
+      "labelLetterSpacing": "0.12em",
+      "labelPosition": "bottom-center, y=88px",
+      "svgPathDescription": "Central skull (width 54px, height 60px): cranium as rounded-top oval path with flat base; two hollow ovoid eye sockets at 30% / 70% x-axis; nasal cavity as inverted heart; eight upper teeth rectangles in jaw arc. Crown: five-pointed iron crown sitting atop cranium, each point tipped with a tiny doubloon circle (r=4px). Decorative cross-hatching along skull cheekbones using 2px stroke lines at 45deg. All fills use --fog-white (#F5ECD7) on main skull shapes, --dark-oak (#2C1A0E) for eye and nose voids.",
+      "mottoRibbon": {
+        "text": "MORS ANTE DEDECUS",
+        "position": "arced ribbon below skull, curve radius 52px",
+        "font": "'IM Fell English', serif",
+        "fontSize": "9px",
+        "fontStyle": "italic",
+        "colour": "#2C1A0E"
+      }
+    },
+    "tailsCoin": {
+      "label": "TAILS",
+      "labelFont": "'Pirata One', cursive",
+      "labelFontSize": "14px",
+      "labelColour": "#2C1A0E",
+      "labelLetterSpacing": "0.12em",
+      "labelPosition": "bottom-center, y=88px",
+      "svgPathDescription": "Two crossed cutlasses (blade length 60px, hilt 18px) forming an X centred on the coin face. Each blade: tapered quadrilateral path, wider at guard (8px) narrowing to 2px tip; guard is a straight crosspiece (20px wide, 4px thick); grip is wrapped with a diagonal hatching pattern. Below the X-intersection sits an anchor (total height 40px): ring at top (r=8px), vertical shank (3px wide, 22px tall), flukes curving outward at base (wingspan 30px). Cutlass fills: --doubloon-amber (#C8860A) for blade, --dark-oak (#2C1A0E) for hilt. Anchor fill: --sea-shadow (#0D1B2A) with --treasure-gold (#FFD700) 1px stroke.",
+      "mottoRibbon": {
+        "text": "IN MARE SEMPER",
+        "position": "arced ribbon below anchor, curve radius 52px",
+        "font": "'IM Fell English', serif",
+        "fontSize": "9px",
+        "fontStyle": "italic",
+        "colour": "#2C1A0E"
+      }
+    }
+  },
+
+  "backgroundScene": {
+    "theme": "Torchlit pirate treasure cavern, post-raid",
+    "baseLayer": {
+      "fill": "#0D1B2A",
+      "texture": "CSS noise overlay using SVG feTurbulence (baseFrequency 0.65, numOctaves 3, opacity 0.08) simulating damp stone",
+      "vignette": "radial-gradient(ellipse 80% 60% at 50% 50%, transparent 40%, rgba(0,0,0,0.85) 100%) — fixed overlay layer z-index 1"
+    },
+    "midLayer": {
+      "cavern_walls": "Left and right edges: irregular dark-stone silhouette SVG paths in --dark-oak (#2C1A0E), top-edge stalactite row (8–12 irregular drips)",
+      "floor": "Sandy cavern floor occupying bottom 28% of viewport, colour: linear-gradient(180deg, #4A3520 0%, #2C1A0E 100%)"
+    },
+    "elements": {
+      "torchLeft": {
+        "position": "x: 6%, y: 25%",
+        "size": "40px wide, 120px tall",
+        "description": "Wall-mounted iron bracket torch. Bracket: --dark-oak SVG rect. Flame: 3-layer CSS keyframe flicker (see animation section). Halo: radial-gradient in --torch-orange (#FF6B2B) at 40% opacity, radius 120px",
+        "zIndex": 3
+      },
+      "torchRight": {
+        "position": "x: 94%, y: 25%",
+        "size": "40px wide, 120px tall",
+        "description": "Mirror of torchLeft — flicker animation offset by 340ms for visual independence",
+        "zIndex": 3
+      },
+      "sandRing": {
+        "position": "center, y: 62%",
+        "size": "360px diameter",
+        "description": "Elliptical sand ring drawn in CSS: border 6px dashed --doubloon-amber (#C8860A) at 60% opacity on an ellipse. Interior fill: rgba(74, 53, 32, 0.3). Subtle 'RING' text stencilled at bottom arc in --fog-white at 20% opacity, font-size 11px, Pirata One.",
+        "zIndex": 2
+      },
+      "kip": {
+        "position": "center, y: 68%",
+        "size": "160px wide, 28px tall",
+        "description": "Driftwood plank SVG: irregular rectangular path with slight curve along top edge, wood-grain lines (6–8 horizontal strokes in slightly varied brown tones), worn corners. Fill: linear-gradient(95deg, #5A3A1A, #2C1A0E, #5A3A1A). Coins rest on top-center of kip before launch.",
+        "zIndex": 4
+      },
+      "treasureChestTopLeft": {
+        "position": "x: 3%, y: 78%",
+        "size": "80px wide, 64px tall",
+        "description": "Partially open chest, lid ajar 20deg. Closed-lid state by default; lid opens to 60deg on win events > 5× bet. Fill: --dark-oak body, --doubloon-amber metal bands and lock hasp. Gold coin glow emanates from interior when open.",
+        "zIndex": 2,
+        "states": ["closed", "ajar", "open"]
+      },
+      "treasureChestTopRight": {
+        "position": "x: 97%, y: 78%",
+        "size": "80px wide, 64px tall",
+        "description": "Closed chest, identical construction to left. Lid flips open on jackpot / OddingOut animations.",
+        "zIndex": 2,
+        "states": ["closed", "ajar", "open"]
+      }
+    },
+    "particleSystems": {
+      "goldDust": {
+        "particleCount": 40,
+        "description": "Floating gold motes drifting upward from sand ring. Each particle: 2–4px circle, fill #FFD700, opacity oscillates 0.2→0.8. Random x-drift ±30px per cycle. Lifetime: 3000–5000ms. Respawn at ring-floor level continuously.",
+        "spawnArea": "ellipse centered at 50% x, 65% y, radii 180px × 40px",
+        "driftDirection": "upward, slight rightward bias +5px/s",
+        "animationName": "gold-dust-float"
+      },
+      "torchSpark": {
+        "particleCount": 12,
+        "description": "Hot sparks ejected from each torch flame. Each spark: 1–3px circle, fill --torch-orange (#FF6B2B), short lifespan 400–800ms. Trajectory: parabolic arc upward and outward 20–50px before fading to opacity 0.",
+        "spawnRate": "3–5 per second per torch",
+        "animationName": "torch-spark-eject"
+      }
+    }
+  },
+
+  "characterAssets": {
+    "pirateCaptain": {
+      "role": "Boxer — manages bets, calls the action",
+      "position": "Left edge of SpinArena, x: 14%, y: 30–85%, height: 55vh",
+      "artStyle": "Stylised 2D illustration, high contrast, ink-outlined",
+      "appearance": "Tall one-eyed pirate captain. Tricorn hat with skull pin. Weathered naval coat in --dark-oak. Leather eye-patch over left eye. Hook hand (right). Sash of --blood-red. Boots with buckles.",
+      "expressionStates": {
+        "neutral":  "Arms crossed, single eye half-lidded, faint smirk. Default idle state. Subtle breathing cycle: scale(1) → scale(1.005) at 3s interval.",
+        "excited":  "Both arms raised (hook glinting), eye wide, mouth open in grin. Triggered on WIN result.",
+        "angry":    "Hook pointed at camera, eye narrowed to slit, furrowed brow. Triggered on ODDED_OUT / BARRED result.",
+        "pleased":  "Thumbs-up with good hand, eye closed in satisfied wink, subtle nod animation. Triggered on HEADS win streak ≥3."
+      },
+      "idleAnimations": [
+        "breathing-sway: translateX(0) → translateX(3px) over 4s ease-in-out infinite alternate",
+        "hat-tilt: rotate(0deg) → rotate(1deg) over 6s ease-in-out infinite alternate"
+      ],
+      "zIndex": 6
+    },
+    "parrot": {
+      "role": "Comic companion, outcome commentator",
+      "position": "Top-right corner of viewport, x: 91%, y: 8%",
+      "artStyle": "Flat vector, bright plumage, cartoonish",
+      "appearance": "Scarlet macaw with --treasure-gold wing tips. Perched on a wooden post stub. Swings on perch during idle.",
+      "animationStates": {
+        "idle":         "perch-swing: rotate(-8deg) → rotate(8deg) over 1.8s ease-in-out infinite alternate",
+        "react_win":    "Wing-flap 3× rapid, squawk beak open/close 2×. Duration: 1200ms.",
+        "react_loss":   "Hides face under wing. Duration: 800ms hold.",
+        "react_odds":   "Head tilts 45deg left, question-mark emoji floats above. Duration: 600ms.",
+        "react_odded":  "Falls off perch (translateY +120px), flies back up. Duration: 1800ms."
+      },
+      "dialogueBubbles": {
+        "WIN":      ["\"Pieces of eight!\"", "\"Gold fer us, lad!\"", "\"Strike it rich!\""],
+        "LOSS":     ["\"Davy Jones!\"", "\"Walk the plank...\"", "\"Squawk... rough seas.\""],
+        "ODDS":     ["\"Again! AGAIN!\"", "\"Spin it, scurvy dog!\""],
+        "ODDED_OUT":["\"CURSE! THE CURSE!\"", "\"Five odds! Doomed!\""]
+      },
+      "font": "'IM Fell English', serif",
+      "bubbleFontSize": "13px",
+      "zIndex": 7
+    },
+    "ringie": {
+      "role": "Calls valid/invalid throws, announces result",
+      "position": "Bottom-center of SpinArena, below sandRing, x: 50%, y: 88%",
+      "artStyle": "Minimal silhouette — a hunched old sailor in a pea coat, gesture-driven",
+      "appearance": "Short figure, battered sailor's cap, pointing arm used for result calls",
+      "callAnimations": {
+        "comeInSpinner": "Arm sweeps inward in beckoning arc. Text banner rises: 'COME IN, SPINNER!' Duration: 800ms.",
+        "headsCall":     "Both arms shoot skyward. Gold particle burst from hands. Duration: 600ms.",
+        "tailsCall":     "Arms cross downward. Deep red ripple radiates outward. Duration: 600ms.",
+        "oddsCall":      "Single arm horizontal with palm flat. Amber pulse rings outward. Duration: 500ms.",
+        "barredCall":    "Arms crossed above head in X. Red flash overlay. Duration: 400ms."
+      },
+      "zIndex": 5
+    }
+  },
+
+  "animationKeyframes": {
+    "coinLaunchArc": {
+      "source": "docs/2up.md — Coin Animation Phase 1",
+      "name": "coin-launch",
+      "duration": "1400ms",
+      "easing": "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+      "keyframes": {
+        "0pct":   { "translateY": "0px",    "rotateY": "0deg",    "scale": "1.00", "note": "resting on kip" },
+        "10pct":  { "translateY": "-20px",  "rotateY": "180deg",  "scale": "1.05", "note": "initial launch impulse" },
+        "50pct":  { "translateY": "-280px", "rotateY": "900deg",  "scale": "0.85", "note": "peak height — perspective shrink" },
+        "90pct":  { "translateY": "-20px",  "rotateY": "1620deg", "scale": "1.05", "note": "descent" },
+        "100pct": { "translateY": "0px",    "rotateY": "1800deg", "scale": "1.00", "note": "landed — final face visible" }
+      }
+    },
+    "coinSpinFast": {
+      "source": "docs/2up.md — Coin Animation Phase 2",
+      "name": "coin-spin-fast",
+      "duration": "600ms",
+      "easing": "linear",
+      "appliedAt": "peak height (50% of launch arc)",
+      "keyframes": {
+        "0pct":   { "filter": "blur(0px)",  "rotateY": "0deg" },
+        "50pct":  { "filter": "blur(2px)",  "rotateY": "540deg" },
+        "100pct": { "filter": "blur(0px)",  "rotateY": "1080deg" }
+      }
+    },
+    "coinLandReveal": {
+      "source": "docs/2up.md — Coin Animation Phase 3",
+      "name": "coin-land",
+      "duration": "800ms",
+      "easing": "cubic-bezier(0.34, 1.56, 0.64, 1)",
+      "keyframes": {
+        "0pct":   { "rotateY": "1800deg", "translateY": "-10px" },
+        "60pct":  { "rotateY": "1830deg", "translateY": "-5px" },
+        "80pct":  { "rotateY": "1840deg", "translateY": "-2px" },
+        "100pct": { "rotateY": "1800deg", "translateY": "0px",  "note": "settle on final face" }
+      }
+    },
+    "torchFlicker": {
+      "name": "torch-flicker",
+      "duration": "180ms",
+      "easing": "steps(4, end)",
+      "iterationCount": "infinite",
+      "direction": "alternate",
+      "keyframes": {
+        "0pct":   { "brightness": "1.00", "scaleX": "1.00", "scaleY": "1.00" },
+        "20pct":  { "brightness": "1.15", "scaleX": "1.05", "scaleY": "1.10" },
+        "40pct":  { "brightness": "0.88", "scaleX": "0.96", "scaleY": "0.92" },
+        "60pct":  { "brightness": "1.20", "scaleX": "1.08", "scaleY": "1.15" },
+        "80pct":  { "brightness": "0.95", "scaleX": "1.02", "scaleY": "0.98" },
+        "100pct": { "brightness": "1.05", "scaleX": "1.00", "scaleY": "1.04" }
+      },
+      "rightTorchDelay": "340ms"
+    },
+    "goldDustFloat": {
+      "name": "gold-dust-float",
+      "duration": "3800ms",
+      "easing": "ease-in-out",
+      "iterationCount": "infinite",
+      "particlePaths": [
+        { "id": "path-A", "x": ["0px", "+18px", "+8px",  "-4px" ], "y": ["0px", "-80px", "-160px", "-240px"], "opacity": [0.2, 0.7, 0.5, 0.0] },
+        { "id": "path-B", "x": ["0px", "-22px", "-10px", "+6px" ], "y": ["0px", "-60px", "-140px", "-200px"], "opacity": [0.3, 0.8, 0.4, 0.0] },
+        { "id": "path-C", "x": ["0px", "+10px", "+30px", "+18px"], "y": ["0px", "-90px", "-170px", "-250px"], "opacity": [0.1, 0.6, 0.6, 0.0] }
+      ]
+    },
+    "resultBannerEntrance": {
+      "name": "result-banner-in",
+      "duration": "420ms",
+      "easing": "cubic-bezier(0.34, 1.56, 0.64, 1)",
+      "keyframes": {
+        "0pct":   { "scaleY": "0.0", "opacity": "0", "translateY": "20px" },
+        "100pct": { "scaleY": "1.0", "opacity": "1", "translateY": "0px"  }
+      }
+    },
+    "oddingOutFlicker": {
+      "name": "odding-out-screen-flash",
+      "duration": "200ms",
+      "iterationCount": "5",
+      "direction": "alternate",
+      "keyframes": {
+        "0pct":   { "backgroundColor": "transparent" },
+        "100pct": { "backgroundColor": "rgba(139, 0, 0, 0.35)" }
+      }
+    }
+  },
+
+  "typography": {
+    "importUrl": "https://fonts.googleapis.com/css2?family=Pirata+One&family=IM+Fell+English:ital@0;1&display=swap",
+    "fonts": {
+      "primary": {
+        "family": "'Pirata One', cursive",
+        "usage": "Game title, section headers, result banners, button labels, coin face labels",
+        "sizes": {
+          "gameTitle":    { "size": "clamp(2.4rem, 5vw, 4rem)", "letterSpacing": "0.05em", "textShadow": "0 2px 12px rgba(255,215,0,0.6)" },
+          "resultBanner": { "size": "clamp(2rem, 4vw, 3.2rem)", "letterSpacing": "0.08em" },
+          "sectionHeader":{ "size": "1.4rem",  "letterSpacing": "0.06em" },
+          "buttonLabel":  { "size": "1.1rem",  "letterSpacing": "0.10em", "textTransform": "uppercase" },
+          "coinLabel":    { "size": "14px",    "letterSpacing": "0.12em" }
+        }
+      },
+      "body": {
+        "family": "'IM Fell English', serif",
+        "usage": "Game instructions, bet amounts, log history, parrot dialogue, odds counter",
+        "sizes": {
+          "bodyText":     { "size": "1rem",    "lineHeight": "1.6", "colour": "#F5ECD7" },
+          "betAmount":    { "size": "1.25rem", "fontWeight": "normal", "colour": "#FFD700" },
+          "logEntry":     { "size": "0.85rem", "colour": "rgba(245,236,215,0.7)", "fontStyle": "italic" },
+          "eyebrowLabel": { "size": "0.72rem", "letterSpacing": "0.18em", "textTransform": "uppercase", "colour": "#C8860A", "fontStyle": "normal" }
+        }
+      }
+    },
+    "specialStyles": {
+      "wantedPosterHeader": "font-family: 'Pirata One'; font-size: 1.6rem; color: #2C1A0E; text-shadow: none; background: #F5ECD7; border: 4px double #2C1A0E; padding: 4px 12px;",
+      "dialogueBubble":     "font-family: 'IM Fell English', serif; font-style: italic; font-size: 13px; background: rgba(245,236,215,0.92); color: #2C1A0E; border: 1px solid #C8860A; border-radius: 8px 8px 8px 0; padding: 6px 10px;"
+    }
+  },
+
+  "uiLayoutGrid": {
+    "desktop": {
+      "breakpoint": "min-width: 900px",
+      "layout": "CSS Grid — two columns",
+      "columns": "30% 70%",
+      "rows": "auto 1fr auto",
+      "areas": "\"header header\" \"betting arena\" \"log log\"",
+      "panels": {
+        "titleHeader": {
+          "gridArea": "header",
+          "height": "72px",
+          "background": "linear-gradient(90deg, #2C1A0E 0%, #0D1B2A 50%, #2C1A0E 100%)",
+          "borderBottom": "2px solid #C8860A",
+          "zIndex": 10
+        },
+        "bettingPanel": {
+          "gridArea": "betting",
+          "widthPercent": 30,
+          "minWidth": "260px",
+          "background": "rgba(44, 26, 14, 0.92)",
+          "borderRight": "1px solid rgba(200, 134, 10, 0.4)",
+          "padding": "24px 20px",
+          "overflow": "hidden",
+          "zIndex": 5,
+          "components": [
+            "BetSelector (Heads / Tails / Odds toggle)",
+            "StakeInput (GC or SC amount, no $ prefix)",
+            "CoverBetDisplay (opponent wager echo)",
+            "OddsTracker (consecutive odds badge)",
+            "PLAY button (primary CTA)"
+          ]
+        },
+        "spinArena": {
+          "gridArea": "arena",
+          "widthPercent": 70,
+          "background": "transparent",
+          "position": "relative",
+          "overflow": "hidden",
+          "zIndex": 4,
+          "components": [
+            "GameBackground (torches, sand ring, kip, particles)",
+            "Coin x2 (independently animated)",
+            "ResultBanner",
+            "PirateCapitanCharacter",
+            "RingieCharacter",
+            "ParrotCharacter"
+          ]
+        },
+        "gameLog": {
+          "gridArea": "log",
+          "height": "80px",
+          "background": "rgba(13, 27, 42, 0.95)",
+          "borderTop": "1px solid rgba(200, 134, 10, 0.3)",
+          "padding": "8px 20px",
+          "overflow": "hidden auto",
+          "zIndex": 5
+        }
+      }
+    },
+    "mobile": {
+      "breakpoint": "max-width: 599px",
+      "layout": "CSS Flexbox — single column, stacked",
+      "order": ["titleHeader", "spinArena", "bettingPanel", "gameLog"],
+      "spinArena": {
+        "height": "55vh",
+        "minHeight": "320px"
+      },
+      "bettingPanel": {
+        "width": "100%",
+        "height": "auto",
+        "borderRight": "none",
+        "borderTop": "1px solid rgba(200, 134, 10, 0.4)"
+      },
+      "pirateCapitan": "hidden on viewports < 600px to preserve space",
+      "parrot": "scaled to 60%, repositioned to top-right of spinArena"
+    },
+    "tablet": {
+      "breakpoint": "600px – 899px",
+      "layout": "CSS Grid — two columns, compressed",
+      "columns": "36% 64%",
+      "pirateCapitan": "visible but scaled to 75%"
+    },
+    "zIndexStack": {
+      "baseBackground":     0,
+      "cavernWalls":        1,
+      "vignetteOverlay":    2,
+      "sandRingKip":        3,
+      "torches":            4,
+      "ringie":             5,
+      "pirateCapitan":      6,
+      "parrot":             7,
+      "coins":              8,
+      "resultBanner":       9,
+      "titleHeader":       10,
+      "bettingPanel":       5,
+      "modalOverlay":      20,
+      "tooltips":          30
+    }
+  },
+
+  "stakeUsCompliance": {
+    "source": "docs/Stake_.md — Core Game Rules",
+    "rtpBase": "94.00%",
+    "rtpBonus": "94.40%",
+    "maxWinHitRate": "1 in 20,000,000",
+    "rng": "Provably Fair",
+    "currencyDisplay": {
+      "rule": "No $ prefix on any displayed amounts",
+      "goldCoins": {
+        "symbol": "GC",
+        "format": "1,000 GC",
+        "colour": "#FFD700",
+        "placement": "suffix after value with single space"
+      },
+      "sweepsCoins": {
+        "symbol": "SC",
+        "format": "0.50 SC",
+        "colour": "#F5ECD7",
+        "placement": "suffix after value with single space"
+      },
+      "forbiddenFormats": ["$1,000", "$0.50", "USD 1.00"]
+    },
+    "buttonLabels": {
+      "primaryCTA":       "PLAY",
+      "secondaryCTA":     "SPIN",
+      "forbidden":        ["BET", "WAGER", "GAMBLE"],
+      "font":             "'Pirata One', cursive",
+      "fontSize":         "1.1rem",
+      "letterSpacing":    "0.10em",
+      "textTransform":    "uppercase",
+      "backgroundGC":     "#C8860A",
+      "backgroundSC":     "#2D5016",
+      "hoverBrightness":  "1.15",
+      "activeBrightness": "0.90",
+      "borderRadius":     "6px",
+      "padding":          "12px 28px"
+    },
+    "socialModeToggle": {
+      "description": "Toggle switch in header allowing player to switch between GC (Gold Coins) and SC (Sweeps Coins) modes without page reload",
+      "implementation": "CSS sliding toggle with state managed via JS class on <body> element — body.gc-mode / body.sc-mode",
+      "gcModeBodyClass": "gc-mode",
+      "scModeBodyClass": "sc-mode",
+      "gcAccentColour":  "#FFD700",
+      "scAccentColour":  "#F5ECD7",
+      "labelGC":         "Gold Coins",
+      "labelSC":         "Sweeps Coins",
+      "togglePosition":  "top-right of titleHeader, right: 20px, vertically centered"
+    },
+    "helpTextRequired": "Sweepstakes rules must be accessible via ? icon in header. Links to official Stake.US terms.",
+    "auditTrail": "All rounds must be loggable with seed, result, and bet amounts for Provably Fair verification."
+  },
+
+  "soundDesign": {
+    "note": "Reference from docs/2up.md — Sound Design section",
+    "events": {
+      "coinsLaunch":    { "description": "Whoosh + metallic clink",          "format": "ogg/mp3", "durationMs": 400  },
+      "coinSpinPeak":   { "description": "Ringing shimmer loop",             "format": "ogg/mp3", "durationMs": 600, "loop": true },
+      "landingHeads":   { "description": "Triumphant brass sting",           "format": "ogg/mp3", "durationMs": 1200 },
+      "landingTails":   { "description": "Deep drum thud",                   "format": "ogg/mp3", "durationMs": 800  },
+      "odds":           { "description": "Mysterious chord",                 "format": "ogg/mp3", "durationMs": 900  },
+      "oddingOut":      { "description": "Dramatic pipe organ chord",        "format": "ogg/mp3", "durationMs": 2000 },
+      "win":            { "description": "Coins cascading + crowd cheer",    "format": "ogg/mp3", "durationMs": 2400 },
+      "lose":           { "description": "Pirate groan + splash",            "format": "ogg/mp3", "durationMs": 1600 },
+      "comeInSpinner":  { "description": "Gruff pirate voice line",          "format": "ogg/mp3", "durationMs": 1100 },
+      "pageLoad":       { "description": "Seagull cry on first load",        "format": "ogg/mp3", "durationMs": 1400 }
+    },
+    "implementation": "Web Audio API preferred; fallback to <audio preload='auto'> for mobile Safari compatibility"
+  },
+
+  "bonusFeatures": {
+    "treasureChestOpener": {
+      "trigger": "WIN with payout > 5× stake",
+      "animation": "Chest lid flies open (rotateX -90deg over 400ms), gold coins burst upward (40 particles), ambient glow expands to 200px radius"
+    },
+    "wantedPosterLeaderboard": {
+      "style": "Parchment-coloured panel with 'WANTED' header in Pirata One, list of top 10 wins in IM Fell English italic",
+      "position": "Accessible via trophy icon button in titleHeader"
+    },
+    "customCursor": {
+      "css": "cursor: url('/assets/skull-crossbones-cursor.cur') 16 16, crosshair",
+      "fallback": "crosshair"
+    },
+    "bobbingShip": {
+      "description": "CSS-animated dark ship silhouette behind cavern mouth, bottom 10% of background",
+      "animation": "translateY(0px) → translateY(-8px) → translateY(0px), 4s ease-in-out infinite"
+    }
+  },
+
+  "deliverables": {
+    "conceptDoc":     "docs/dead-mens-doubloons-concept.json  (this file)",
+    "requirementsDoc":"docs/Stake_.md",
+    "sourceDoc":      "docs/2up.md",
+    "nextStep":       "Hand off to UI Developer for implementation against frontend/src/ using this spec as single source of truth"
+  }
+}
