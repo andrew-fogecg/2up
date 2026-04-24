@@ -10,6 +10,15 @@
 
 ## Next steps
 
+- [x] Fix social-currency stake precision for `SC` / `XSC` / `GC` / `XGC`.
+	Stake entry and display precision now derive from an explicit social-currency wager step so fractional bets like `0.1 SC` are possible.
+
+- [x] Add regression coverage for compliance-critical text and social-currency precision.
+	Playwright now checks the live malfunction disclaimer and verifies fractional `SC` stake entry through round completion.
+
+- [x] Decide how QA screenshot artifacts should be handled in git.
+	Generated visual-review output is now ignored so local QA runs do not pollute the worktree.
+
 - [x] Implement actual replay mode with `?replay=` handling.
 	Add event loading, replay state wiring, support for `currency`, `language`, and `amount` overrides, and a clear separation between normal play and replay play in `frontend/src/main.js`.
 

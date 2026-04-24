@@ -1,4 +1,4 @@
-import { TwoUpGame, BetType, GameState, CURRENCY_META, formatAmount } from './game/TwoUpGame.js';
+import { TwoUpGame, BetType, GameState, getCurrencyInputDecimals, getCurrencyInputStep, formatAmount } from './game/TwoUpGame.js';
 import SoundEngine from './audio/SoundEngine.js';
 import './style.css';
 
@@ -104,14 +104,20 @@ function buildRulesModalHTML(currency, uiCopy) {
 }
 
 function getInputStep(currency) {
-  const decimals = CURRENCY_META[currency]?.decimals ?? 2;
+  const step = getCurrencyInputStep(currency);
+  const decimals = getCurrencyInputDecimals(currency);
   if (decimals <= 0) return '1';
-  return (1 / (10 ** decimals)).toFixed(decimals);
+  return step.toFixed(decimals);
 }
 
 function formatInputUnits(units, currency) {
-  const decimals = CURRENCY_META[currency]?.decimals ?? 2;
-  return Number(units).toFixed(decimals);
+  const decimals = getCurrencyInputDecimals(currency);
+  if (decimals <= 0) return String(Number(units));
+
+  const formatted = Number(units).toFixed(decimals);
+  return formatted
+    .replace(/(\.\d*?[1-9])0+$/, '$1')
+    .replace(/\.0+$/, '');
 }
 
 const REPLAY_STORAGE_KEY = 'dmd-replays-v1';

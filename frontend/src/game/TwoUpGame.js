@@ -31,12 +31,51 @@ export const CURRENCY_META = {
   ZAR: { symbol: 'ZAR', decimals: 2, symbolAfter: true },
 };
 
+const CURRENCY_INPUT_STEP = Object.freeze({
+  SC: 0.1,
+  XSC: 0.1,
+  GC: 0.1,
+  XGC: 0.1,
+});
+
 const MICRO = 1_000_000;
+
+function decimalsFromStep(stepUnits) {
+  const normalized = String(stepUnits);
+  const decimals = normalized.includes('.') ? normalized.split('.')[1].length : 0;
+  return decimals;
+}
+
+export function getCurrencyInputStep(currency = 'GC') {
+  if (currency in CURRENCY_INPUT_STEP) {
+    return CURRENCY_INPUT_STEP[currency];
+  }
+
+  const meta = CURRENCY_META[currency] ?? { decimals: 2 };
+  if ((meta.decimals ?? 2) <= 0) {
+    return 1;
+  }
+
+  return 1 / (10 ** meta.decimals);
+}
+
+export function getCurrencyInputDecimals(currency = 'GC') {
+  return decimalsFromStep(getCurrencyInputStep(currency));
+}
 
 export function formatAmount(microUnits, currency = 'GC') {
   const meta = CURRENCY_META[currency] ?? { symbol: currency, decimals: 2 };
+  const inputDecimals = getCurrencyInputDecimals(currency);
+  const displayDecimals = Math.max(meta.decimals ?? 2, inputDecimals);
   const value = microUnits / MICRO;
-  const formatted = value.toFixed(meta.decimals);
+  let formatted = value.toFixed(displayDecimals);
+
+  if ((meta.decimals ?? 2) < displayDecimals) {
+    formatted = formatted
+      .replace(/(\.\d*?[1-9])0+$/, '$1')
+      .replace(/\.0+$/, '');
+  }
+
   return meta.symbolAfter ? `${formatted} ${meta.symbol}` : `${meta.symbol}${formatted}`;
 }
 

@@ -45,6 +45,7 @@ test('renders the live two-up game shell', async ({ page }, testInfo) => {
   await expect(page.locator('#play-btn-text')).toHaveText('PLAY');
   await expect(page.locator('#balance-value')).toContainText('1000 GC');
   await expect(page.locator('#sound-toggle')).toBeVisible();
+  await expect(page.locator('.malfunction-notice')).toContainText('Malfunction voids all pays and plays');
 });
 
 test('renders social-mode wording without dollar formatting', async ({ page }, testInfo) => {
@@ -56,6 +57,26 @@ test('renders social-mode wording without dollar formatting', async ({ page }, t
   await expect(page.locator('.potential-win-label')).toHaveText('Potential Return');
   await expect(page.locator('#balance-value')).toContainText('1000 SC');
   await expect(page.locator('#balance-value')).not.toContainText('$');
+});
+
+test('social currency accepts fractional stake amounts', async ({ page }, testInfo) => {
+  await page.goto('/?social=1&currency=SC&balance=1000');
+
+  await expect(page.locator('#stake-input')).toHaveAttribute('step', '0.1');
+  await page.locator('#stake-input').fill('0.1');
+  await expect(page.locator('#stake-input')).toHaveValue('0.1');
+  await expect(page.locator('#potential-win-value')).toContainText('0.1 SC');
+  await captureReviewStep(page, testInfo, 'fractional-social-stake-configured', {
+    device: testInfo.project.name,
+    currency: 'SC',
+    stakeValue: '0.1',
+  });
+
+  await page.locator('#play-btn').click();
+  await waitForRoundToFinish(page);
+
+  await expect(page.locator('#history-list .history-entry')).toHaveCount(1);
+  await expect(page.locator('#history-list .history-bet')).toContainText('0.1 SC');
 });
 
 test('game info modal opens and blocks spacebar play', async ({ page }, testInfo) => {

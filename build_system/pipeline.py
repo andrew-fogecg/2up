@@ -465,7 +465,7 @@ def run_pipeline(repo_root: Path) -> PipelineResult:
     qa_issues: list[str] = []
     social_labels = frontend_content["buttonLabels"]["social"]
     banned_words = frontend_content["socialModeCopy"]["bannedWords"]
-    if "event.code === 'Space'" not in main_js_content and 'event.code === "Space"' not in main_js_content:
+    if not re.search(r"\b\w+\.code\s*===\s*['\"]Space['\"]", main_js_content):
         qa_issues.append("Spacebar binding is missing from the frontend entrypoint")
     for token in ["sessionID", "nonce", "social", "currency", "rgs_url"]:
         if token not in replay_js_content:
