@@ -5,19 +5,30 @@
 
 // ─── Currency Meta ────────────────────────────────────────────────────────────
 export const CURRENCY_META = {
+  AED: { symbol: 'AED', decimals: 2, symbolAfter: true },
+  ARS: { symbol: 'ARS', decimals: 2, symbolAfter: true },
   USD: { symbol: '$',   decimals: 2 },
   EUR: { symbol: '€',   decimals: 2 },
   GBP: { symbol: '£',   decimals: 2 },
   AUD: { symbol: 'A$',  decimals: 2 },
+  BHD: { symbol: 'BHD', decimals: 3, symbolAfter: true },
   CAD: { symbol: 'CA$', decimals: 2 },
   BRL: { symbol: 'R$',  decimals: 2 },
+  CRC: { symbol: 'CRC', decimals: 2, symbolAfter: true },
+  IDR: { symbol: 'IDR', decimals: 0, symbolAfter: true },
   MXN: { symbol: 'MX$', decimals: 2 },
   JPY: { symbol: '¥',   decimals: 0 },
+  KWD: { symbol: 'KWD', decimals: 3, symbolAfter: true },
   KRW: { symbol: '₩',   decimals: 0 },
+  OMR: { symbol: 'OMR', decimals: 3, symbolAfter: true },
+  SAR: { symbol: 'SAR', decimals: 2, symbolAfter: true },
   SC:  { symbol: 'SC',  decimals: 0, symbolAfter: true },
+  TWD: { symbol: 'TWD', decimals: 2, symbolAfter: true },
+  UAH: { symbol: 'UAH', decimals: 2, symbolAfter: true },
   XSC: { symbol: 'SC',  decimals: 0, symbolAfter: true },
   GC:  { symbol: 'GC',  decimals: 0, symbolAfter: true },
   XGC: { symbol: 'GC',  decimals: 0, symbolAfter: true },
+  ZAR: { symbol: 'ZAR', decimals: 2, symbolAfter: true },
 };
 
 const MICRO = 1_000_000;
@@ -245,6 +256,8 @@ export class TwoUpGame {
     this._setState(GameState.RESOLVING);
 
     const bet = this._currentBet;
+    const startingBalance = this.wallet;
+    const eventId = `${this.sessionID}-${this.roundNumber}-${Date.now().toString(36).toUpperCase()}`;
     let profit = 0;
 
     if (outcome === 'HEADS' && bet.type === BetType.HEADS) {
@@ -280,10 +293,20 @@ export class TwoUpGame {
 
     // Record history
     this.roundHistory.unshift({
+      eventId,
+      sessionID:   this.sessionID,
       round:      this.roundNumber,
+      startBalance: startingBalance,
       betType:    bet.type,
       betAmount:  bet.amount,
       tosses:     this._tosses.map(t => t.result),
+      tossDetails: this._tosses.map(t => ({
+        coin1: t.coin1,
+        coin2: t.coin2,
+        result: t.result,
+        nonce: t.nonce,
+        hash: t.hash,
+      })),
       outcome,
       profit,
       balance:    this.wallet,

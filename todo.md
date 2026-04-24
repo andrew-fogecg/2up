@@ -1,40 +1,29 @@
-# Build System Todo
+# Dead Men's Doubloons Review Tasks
 
-## High Priority
+## Completed
 
-- Extend the production-art interface so approved assets can be authored, validated, and published as final deliverables.
-- Extend the configurable gameplay engine layer beyond the current first-pass reel, cluster, and pick profiles.
-- Improve requirement inference so vague concepts can produce richer draft rulesets and contradiction checks.
+- [x] Implement live social-mode UI gating for the main labels, banners, and validation errors.
+- [x] Fix currency display and amount formatting in the balance, history, potential award, and MAX amount flow.
+- [x] Render the full Stake disclaimer in the live footer.
+- [x] Add a Game Info / Rules modal with multiplier table, game modes, round flow, button guide, RTP/max award, and modal keyboard guards.
+- [x] Validate the frontend build after the above changes.
 
-## Art Pipeline
+## Next steps
 
-- Replace placeholder icon generation with production-ready icon composition.
-- Generate production-ready symbol sets, board frames, backgrounds, and UI panels.
-- Add animation/export support for wins, scatters, and reel motion assets.
-- Add a review step for final art approval before packaging.
+- [x] Implement actual replay mode with `?replay=` handling.
+	Add event loading, replay state wiring, support for `currency`, `language`, and `amount` overrides, and a clear separation between normal play and replay play in `frontend/src/main.js`.
 
-## Gameplay Engine
+- [x] Add a persistent `REPLAY MODE` banner and replay-again behavior.
+	The banner must stay visible for the full replay session, spacebar must not trigger live play during replay, and the end of replay needs a button to replay the same event again.
 
-- Move from fixed template math to mechanic-driven config generation.
-- Support arbitrary win conditions, bonus modes, reel structures, and feature state transitions.
-- Add mechanic-specific simulation and balancing hooks.
-- Add rule-driven UI component generation from parsed requirements.
+- [x] Add an always-visible sound toggle with session-persisted mute state.
+	Wire `frontend/src/audio/SoundEngine.js` mute/unmute controls into `frontend/src/main.js`, keep the control accessible across layouts, and persist the choice in session storage.
 
-## Requirement Inference
+- [x] Replace the stale Playwright suite with tests for the current Two-Up game.
+	Remove the old template assertions from `frontend/tests/app.spec.js` and add coverage for the live UI, social-mode wording, Game Info modal behavior, and spacebar guards.
 
-- Extract missing assumptions automatically from vague overviews.
-- Generate a draft assumption list before build execution.
-- Mark inferred rules separately from explicit user requirements.
-- Require review/approval before inferred rules are treated as locked requirements.
+- [x] Add replay-focused regression tests.
+	Cover `?replay=` handling, replay banner visibility, replay-again flow, URL override parsing, and replay keyboard restrictions.
 
-## Testing
-
-- Expand browser coverage to feature-specific gameplay tests.
-- Add regression tests for generated assets and generated config.
-- Add validation for inferred-rule completeness and contradiction detection.
-
-## Integration
-
-- Add external model-backed design/code generation as an optional runtime.
-- Add backend or RGS integration for real gameplay execution.
-- Add deploy publishing beyond the current packaged release archive.
+- [ ] Run a manual approval pass after replay and sound are complete.
+	Verify social wording, replay flow, sound toggle persistence, modal behavior, and current build output before moving on to RGS integration.

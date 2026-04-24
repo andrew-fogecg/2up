@@ -13,9 +13,10 @@
   --blood-red:      #8B0000;
   --kelp-green:     #2D5016;
 
-  --coin-size: 110px;
-  font-family: 'IM Fell English', serif;
+  --coin-size: 130px;
+  font-family: Georgia, 'Times New Roman', serif;
   color: var(--fog-white);
+  font-size: 17px;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -188,7 +189,7 @@ body {
   position: relative;
   z-index: 20;
   text-align: center;
-  padding: 24px 16px 12px;
+  padding: 16px 16px 10px;
 }
 
 .header-ornament {
@@ -215,7 +216,7 @@ body {
 .game-subtitle {
   font-style: italic;
   color: var(--fog-white);
-  opacity: 0.7;
+  opacity: 0.85;
   margin: 0 0 16px;
   font-size: 1.1rem;
 }
@@ -239,9 +240,9 @@ body {
 }
 
 .session-id {
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   color: var(--fog-white);
-  opacity: 0.4;
+  opacity: 0.55;
 }
 
 /* ── Main game layout ────────────────────────────────────────── */
@@ -249,11 +250,103 @@ body {
   position: relative;
   z-index: 20;
   display: grid;
-  grid-template-columns: 300px 1fr;
+  grid-template-columns: 280px 1fr 280px;
   gap: 16px;
-  max-width: 1200px;
+  max-width: 1340px;
   margin: 0 auto;
   padding: 0 16px 16px;
+  align-items: start;
+}
+
+/* ── Voyage Log Panel (right column) ────────────────────────── */
+.voyage-log-panel {
+  background: rgba(20,10,4,0.82);
+  border: 1px solid rgba(200,134,10,0.3);
+  border-radius: 16px;
+  padding: 16px 14px 14px;
+  backdrop-filter: blur(10px);
+  align-self: start;
+  max-height: 80vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(200,134,10,0.4) transparent;
+}
+
+.voyage-log-panel::-webkit-scrollbar { width: 4px; }
+.voyage-log-panel::-webkit-scrollbar-track { background: transparent; }
+.voyage-log-panel::-webkit-scrollbar-thumb { background: rgba(200,134,10,0.4); border-radius: 4px; }
+
+.voyage-log-title {
+  font-family: Georgia, 'Times New Roman', serif;
+  color: var(--treasure-gold);
+  font-size: 1.02rem;
+  font-weight: 700;
+  margin: 0 0 12px;
+  text-align: center;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* In the right panel the history entries are single-column */
+.voyage-log-panel .history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.voyage-log-panel .history-entry {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  gap: 6px 8px;
+  font-size: 0.8rem;
+  padding: 10px 10px 9px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.04);
+  border-color: rgba(255,255,255,0.06);
+}
+
+.voyage-log-panel .history-round {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.voyage-log-panel .history-bet {
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.2;
+  opacity: 0.92;
+}
+
+.voyage-log-panel .history-tosses {
+  display: block;
+  grid-column: 1 / -1;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  opacity: 0.56;
+  margin-top: 1px;
+}
+
+.voyage-log-panel .history-outcome {
+  justify-self: start;
+  font-size: 0.64rem;
+  padding: 3px 7px;
+  letter-spacing: 0.08em;
+}
+
+.voyage-log-panel .history-balance { display: none; }
+
+.voyage-log-panel .history-profit {
+  font-size: 0.78rem;
+  text-align: right;
+  align-self: start;
+}
+
+.voyage-log-panel .history-empty {
+  text-align: center;
+  font-size: 0.82rem;
+  opacity: 0.5;
+  padding: 16px 10px;
 }
 
 /* ── Betting Panel ───────────────────────────────────────────── */
@@ -270,8 +363,11 @@ body {
 }
 
 .panel-title {
-  font-family: 'Pirata One', cursive;
-  font-size: 1.3rem;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--treasure-gold);
   margin: 0;
   text-align: center;
@@ -285,18 +381,19 @@ body {
 }
 
 .bet-btn {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 10px;
-  padding: 12px 14px;
+  padding: 12px 12px;
   border: 2px solid transparent;
   border-radius: 10px;
   background: rgba(255,255,255,0.05);
   color: var(--fog-white);
   cursor: pointer;
   transition: all 0.2s ease;
-  font-family: 'Pirata One', cursive;
-  font-size: 1rem;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.05rem;
 }
 
 .bet-btn:hover { background: rgba(255,255,255,0.1); }
@@ -322,9 +419,127 @@ body {
   box-shadow: 0 0 16px rgba(168,85,247,0.25);
 }
 
-.bet-btn-icon  { font-size: 1.3rem; }
-.bet-btn-label { flex: 1; font-size: 1rem; }
-.bet-btn-odds  { font-size: 0.78rem; opacity: 0.6; }
+.bet-btn--odds {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas: "icon label odds";
+}
+
+.bet-btn-icon {
+  width: 52px;
+  min-width: 52px;
+  height: 52px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bet-btn--odds .bet-btn-icon {
+  grid-area: icon;
+  align-self: center;
+}
+
+.bet-btn--odds .bet-btn-icon--pair {
+  width: 56px;
+  min-width: 56px;
+}
+
+.bet-btn--odds .bet-btn-icon--pair img {
+  width: 32px;
+  height: 32px;
+}
+
+.bet-btn--odds .bet-btn-icon--pair img:first-child {
+  top: 10px;
+}
+
+.bet-btn--odds .bet-btn-icon--pair img:last-child {
+  top: 10px;
+}
+
+.bet-btn-icon--coin img,
+.bet-btn-icon--pair img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.22);
+}
+
+.bet-btn-icon--pair {
+  position: relative;
+  width: 64px;
+  min-width: 64px;
+}
+
+.bet-btn-icon--pair img {
+  position: absolute;
+  width: 38px;
+  height: 38px;
+}
+
+.bet-btn-icon--pair img:first-child {
+  left: 0;
+  top: 7px;
+}
+
+.bet-btn-icon--pair img:last-child {
+  right: 0;
+  top: 7px;
+}
+
+.bet-btn-label {
+  min-width: 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(1rem, 2.5vw, 1.28rem);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  line-height: 1.05;
+}
+
+.bet-btn--odds .bet-btn-label {
+  grid-area: label;
+}
+
+.bet-btn-label--mismatch {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+}
+
+.bet-btn-count {
+  font-size: 1.5rem;
+  color: var(--treasure-gold);
+}
+
+.bet-btn-copy {
+  min-width: 0;
+  font-size: 0.82em;
+  letter-spacing: 0.05em;
+}
+
+.bet-btn--odds .bet-btn-label {
+  font-size: clamp(0.84rem, 1.95vw, 0.98rem);
+  letter-spacing: 0.03em;
+  width: 100%;
+  overflow: hidden;
+}
+
+.bet-btn-odds {
+  font-size: 0.78rem;
+  opacity: 0.6;
+  white-space: nowrap;
+}
+
+.bet-btn--odds .bet-btn-odds {
+  grid-area: odds;
+  justify-self: end;
+  align-self: center;
+  margin-top: 0;
+  font-size: 0.7rem;
+}
 
 /* ── Stake input ─────────────────────────────────────────────── */
 .stake-section {
@@ -334,11 +549,12 @@ body {
 }
 
 .stake-label {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  opacity: 0.6;
-  font-family: 'Pirata One', cursive;
+  letter-spacing: 0.1em;
+  opacity: 0.8;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 700;
 }
 
 .stake-input-row {
@@ -353,7 +569,7 @@ body {
   border: 1px solid rgba(200,134,10,0.4);
   border-radius: 8px;
   color: var(--fog-white);
-  font-family: 'IM Fell English', serif;
+  font-family: Georgia, serif;
   font-size: 1.1rem;
   padding: 8px 10px;
   outline: none;
@@ -362,7 +578,8 @@ body {
 .stake-input:focus { border-color: var(--treasure-gold); }
 
 .stake-currency-label {
-  font-family: 'Pirata One', cursive;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 700;
   color: var(--treasure-gold);
   font-size: 1rem;
 }
@@ -458,8 +675,8 @@ body {
 }
 .seed-info { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
 .seed-row  { display: flex; flex-direction: column; gap: 3px; }
-.seed-row label { font-size: 0.72rem; opacity: 0.55; text-transform: uppercase; letter-spacing: 0.1em; }
-.seed-value { font-size: 0.75rem; word-break: break-all; color: var(--treasure-gold); opacity: 0.7; }
+.seed-row label { font-size: 0.78rem; opacity: 0.75; text-transform: uppercase; letter-spacing: 0.1em; }
+.seed-value { font-size: 0.8rem; word-break: break-all; color: var(--treasure-gold); opacity: 0.85; }
 .seed-input {
   background: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.14);
@@ -483,6 +700,109 @@ body {
 }
 .seed-btn:hover { background: rgba(255,215,0,0.2); }
 
+.info-btn {
+  background: rgba(255,215,0,0.1);
+  border: 1px solid rgba(255,215,0,0.25);
+  border-radius: 8px;
+  color: var(--treasure-gold);
+  font-family: 'Pirata One', cursive;
+  font-size: 0.95rem;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.info-btn:hover {
+  background: rgba(255,215,0,0.2);
+  transform: translateY(-1px);
+}
+
+.rules-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(7, 4, 1, 0.82);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 50;
+}
+
+.rules-backdrop.hidden {
+  display: none;
+}
+
+.rules-modal {
+  position: relative;
+  width: min(720px, 100%);
+  max-height: min(84vh, 760px);
+  overflow-y: auto;
+  background: rgba(18, 10, 4, 0.96);
+  border: 1px solid rgba(200,134,10,0.35);
+  border-radius: 18px;
+  box-shadow: 0 24px 70px rgba(0,0,0,0.45);
+  padding: 24px 22px 20px;
+}
+
+.rules-title {
+  font-family: 'Pirata One', cursive;
+  font-size: 1.8rem;
+  color: var(--treasure-gold);
+  margin: 0 0 18px;
+}
+
+.rules-close-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  color: var(--fog-white);
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.rules-section {
+  margin-bottom: 18px;
+}
+
+.rules-section h3 {
+  font-family: 'Pirata One', cursive;
+  font-size: 1.1rem;
+  color: var(--fog-white);
+  margin: 0 0 8px;
+}
+
+.rules-section p,
+.rules-list {
+  margin: 0;
+  color: rgba(245,236,215,0.82);
+  line-height: 1.55;
+}
+
+.rules-list {
+  padding-left: 18px;
+}
+
+.rules-table {
+  display: grid;
+  gap: 8px;
+}
+
+.rules-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: rgba(245,236,215,0.88);
+}
+
 /* ── Spin Arena ─────────────────────────────────────────────── */
 .spin-arena {
   display: flex;
@@ -495,7 +815,7 @@ body {
 
 /* ── Captain ─────────────────────────────────────────────────── */
 .captain-zone {
-  display: flex;
+  display: none;
   align-items: flex-end;
   gap: 10px;
   align-self: flex-start;
@@ -530,13 +850,14 @@ body {
 /* ── Speech Bubbles ─────────────────────────────────────────── */
 .speech-bubble {
   position: relative;
-  background: rgba(245,236,215,0.92);
+  background: rgba(245,236,215,0.95);
   color: var(--dark-oak);
   border-radius: 12px;
   padding: 8px 12px;
   max-width: 220px;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-style: italic;
+  font-family: Georgia, serif;
   box-shadow: 0 4px 16px rgba(0,0,0,0.4);
   opacity: 0;
   transform: translateY(6px) scale(0.95);
@@ -559,6 +880,7 @@ body {
 
 /* ── Parrot zone ─────────────────────────────────────────────── */
 .parrot-zone {
+  display: none;
   position: fixed;
   bottom: 120px;
   right: 16px;
@@ -597,62 +919,82 @@ body {
   border-right-width: 0;
 }
 
-/* ── Ring & Kip ─────────────────────────────────────────────── */
+/* ── Ring & Gameboard ───────────────────────────────────────── */
 .ring-container {
   display: flex;
   justify-content: center;
   width: 100%;
-  padding: 10px 0;
+  padding: 4px 0;
 }
 
-.sand-ring {
+.gameboard {
   position: relative;
-  width: min(420px, 90vw);
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background:
-    radial-gradient(ellipse at 50% 40%, rgba(210,175,90,0.22) 0%, transparent 65%),
-    radial-gradient(ellipse, rgba(180,140,60,0.08) 60%, transparent 100%);
-  border: 3px solid rgba(200,134,10,0.35);
-  box-shadow:
-    inset 0 0 50px rgba(200,134,10,0.1),
-    0 0 40px rgba(200,134,10,0.08);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: min(560px, 98vw);
+  /* image is ~1100×940 */
+  aspect-ratio: 1100 / 940;
+  background: url('/assets/gameboardpng.png') center / contain no-repeat;
 }
 
-.ring-text-arc {
-  position: absolute;
+.replay-banner {
+  position: sticky;
   top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: 'Pirata One', cursive;
-  font-size: 0.65rem;
-  letter-spacing: 0.6em;
-  color: rgba(200,134,10,0.45);
-  text-transform: uppercase;
-}
-
-.kip {
+  z-index: 25;
+  width: min(980px, calc(100% - 24px));
+  margin: 10px auto 0;
+  padding: 10px 14px;
+  border: 1px solid rgba(255,215,0,0.24);
+  border-radius: 12px;
+  background: rgba(20,10,4,0.92);
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-shadow: 0 14px 30px rgba(0,0,0,0.25);
 }
 
-.kip-plank {
-  background:
-    repeating-linear-gradient(
-      90deg,
-      rgba(60,30,10,0.8) 0px, rgba(90,45,15,0.8) 12px,
-      rgba(60,30,10,0.8) 14px, rgba(80,40,12,0.8) 26px
-    ),
-    linear-gradient(180deg, #6b3a18, #3d1e08);
-  width: 200px;
-  height: 36px;
-  border-radius: 6px;
-  border: 2px solid rgba(200,134,10,0.4);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,200,100,0.15);
+.replay-banner.hidden,
+.replay-repeat-btn.hidden {
+  display: none;
+}
+
+.replay-banner__text {
+  font-family: 'Pirata One', cursive;
+  color: var(--treasure-gold);
+  letter-spacing: 0.04em;
+}
+
+.replay-repeat-btn {
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 999px;
+  background: rgba(255,255,255,0.08);
+  color: var(--fog-white);
+  font-family: 'Pirata One', cursive;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+
+.sound-toggle {
+  position: static;
+  z-index: 40;
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 999px;
+  background: rgba(255,215,0,0.14);
+  color: var(--treasure-gold);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 700;
+  padding: 10px 14px;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.22);
+}
+
+/* The dark toss circle sits at ~50% x, ~49% y, diameter ~68% of board width */
+.kip-area {
+  position: absolute;
+  left: 50%;
+  top: 49%;
+  transform: translate(-50%, -50%);
+  width: 64%;
+  aspect-ratio: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -675,44 +1017,26 @@ body {
   position: relative;
   width: 100%;
   height: 100%;
-  transform-style: preserve-3d;
   border-radius: 50%;
-  will-change: transform, filter;
+  will-change: transform;
 }
 
 .coin-face {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
   overflow: hidden;
 }
 
-.coin-face--front {
-  background: conic-gradient(
-    #ffe566 0deg, #C8860A 30deg, #FFD700 60deg, #8b5e00 90deg,
-    #FFD700 120deg, #C8860A 150deg, #ffe566 180deg, #C8860A 210deg,
-    #FFD700 240deg, #8b5e00 270deg, #FFD700 300deg, #C8860A 330deg, #ffe566 360deg
-  );
-  border: 4px solid var(--doubloon-amber);
-  box-shadow: inset 0 0 12px rgba(0,0,0,0.4), 0 0 8px rgba(255,215,0,0.3);
+.coin-face img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+  pointer-events: none;
+  user-select: none;
 }
-
-.coin-face--front svg { width: 100%; height: 100%; }
-
-.coin-face--back {
-  transform: rotateY(180deg);
-  background: conic-gradient(
-    #c0c0c0 0deg, #808080 30deg, #d0d0d0 60deg, #606060 90deg,
-    #c0c0c0 120deg, #808080 150deg, #d0d0d0 180deg, #808080 210deg,
-    #c0c0c0 240deg, #606060 270deg, #d0d0d0 300deg, #808080 330deg, #c0c0c0 360deg
-  );
-  border: 4px solid #808080;
-  box-shadow: inset 0 0 12px rgba(0,0,0,0.4), 0 0 8px rgba(180,180,180,0.2);
-}
-
-.coin-face--back svg { width: 100%; height: 100%; }
 
 .coin-shadow {
   position: absolute;
@@ -737,9 +1061,9 @@ body {
 }
 
 .result-text {
-  font-family: 'Pirata One', cursive;
+  font-family: 'IM Fell English', serif;
   font-size: clamp(1.6rem, 4vw, 2.6rem);
-  letter-spacing: 0.06em;
+  letter-spacing: 0.12em;
   opacity: 0;
   transform: scale(0.85) translateY(8px);
   transition: opacity 0.3s ease, transform 0.3s ease;
@@ -857,14 +1181,14 @@ body {
 
 .history-entry {
   display: grid;
-  grid-template-columns: 40px 1fr 1fr 1fr 80px 90px;
-  gap: 8px;
+  grid-template-columns: 36px 1fr 1fr 80px;
+  gap: 6px;
   align-items: center;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
   border-radius: 8px;
-  padding: 8px 12px;
-  font-size: 0.82rem;
+  padding: 8px 10px;
+  font-size: 0.88rem;
   opacity: 0;
   transform: translateY(-6px);
   transition: opacity 0.3s ease, transform 0.3s ease;
@@ -881,7 +1205,7 @@ body {
 .profit-positive { color: #6fcf97; font-family: 'Pirata One', cursive; }
 .profit-negative { color: #eb5757; font-family: 'Pirata One', cursive; }
 .history-balance { opacity: 0.55; text-align: right; }
-.history-tosses  { font-size: 0.72rem; opacity: 0.55; }
+.history-tosses  { font-size: 0.78rem; opacity: 0.7; }
 
 /* ── Treasure Chests ─────────────────────────────────────────── */
 .chest {
@@ -889,6 +1213,7 @@ body {
   bottom: 60px;
   z-index: 25;
   width: 80px;
+  display: none;
   height: 68px;
 }
 
@@ -958,6 +1283,19 @@ body {
 }
 
 /* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .game-layout {
+    grid-template-columns: 260px 1fr;
+  }
+  .voyage-log-panel {
+    grid-column: 1 / -1;
+    max-height: 260px;
+  }
+  .voyage-log-panel .history-entry {
+    grid-template-columns: 30px 1fr 1fr 60px;
+  }
+}
+
 @media (max-width: 840px) {
   .game-layout {
     grid-template-columns: 1fr;

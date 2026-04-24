@@ -1,20 +1,213 @@
-import { TwoUpGame, BetType, GameState, formatAmount } from './game/TwoUpGame.js';
+import { TwoUpGame, BetType, GameState, CURRENCY_META, formatAmount } from './game/TwoUpGame.js';
 import SoundEngine from './audio/SoundEngine.js';
 import './style.css';
 
+const MICRO_UNITS = 1_000_000;
 const sound = new SoundEngine();
-document.addEventListener('click', () => sound.init(), { once: true });
+document.addEventListener('click', async () => {
+  await sound.init();
+  applySoundPreference();
+}, { once: true });
 
 // --- Replay Context ---
 function getReplayContext() {
   const p = new URLSearchParams(window.location.search);
+  const socialFlag = ['1','true'].includes((p.get('social') ?? '').toLowerCase());
+  const socialHost = /(^|\.)stake\.us$/i.test(window.location.hostname);
   return {
+    replay:    p.get('replay') ?? null,
     sessionID: p.get('sessionID') ?? null,
     nonce:     parseInt(p.get('nonce') ?? '1', 10),
-    social:    ['1','true'].includes((p.get('social') ?? '').toLowerCase()),
+    social:    socialFlag || socialHost,
+    language:  p.get('language') ?? null,
     currency:  p.get('currency') ?? 'GC',
+    amount:    p.get('amount') ? parseFloat(p.get('amount')) : null,
     balance:   p.get('balance') ? parseFloat(p.get('balance')) : null,
   };
+}
+
+function getUiCopy(isSocial) {
+  return {
+    panelTitle: 'Select Outcome',
+    stakeLabel: 'Stake',
+    potentialLabel: isSocial ? 'Potential Return' : 'Potential Return',
+    idlePrompt: 'Choose an outcome and press play.',
+    winBanner: isSocial ? 'NICE!' : 'YE WIN!',
+    lossBanner: isSocial ? 'TRY AGAIN!' : 'YE LOSE!',
+    invalidAmountError: isSocial ? 'Enter a valid amount.' : 'Enter a valid amount.',
+    insufficientBalanceError: isSocial
+      ? 'Insufficient balance.'
+      : 'Insufficient balance.',
+    disclaimer: isSocial
+      ? 'Malfunction voids all awards and rounds. A consistent internet connection is required. In the event of a disconnection, reload the game to finish any uncompleted rounds. The expected return is calculated over many rounds. Animations are not representative of any physical device, and are for illustrative purposes only. TM and © 2026 Stake Engine.'
+      : 'Malfunction voids all pays and plays. A consistent internet connection is required. In the event of a disconnection, reload the game to finish any uncompleted rounds. The expected return is calculated over many rounds. Animations are not representative of any physical device, and are for illustrative purposes only. TM and © 2026 Stake Engine.',
+  };
+}
+
+function formatDisplayUnits(units, currency) {
+  return formatAmount(Math.round(units * MICRO_UNITS), currency);
+}
+
+function buildRulesModalHTML(currency, uiCopy) {
+  const amountAtMax = formatDisplayUnits(100, currency);
+  const disclaimerTitle = uiCopy.disclaimer.startsWith('Malfunction voids all awards')
+    ? 'Malfunction voids all awards and rounds.'
+    : 'Malfunction voids all pays and plays.';
+
+  return `
+    <div class="rules-backdrop hidden" id="rules-backdrop" aria-hidden="true">
+      <div class="rules-modal" role="dialog" aria-modal="true" aria-labelledby="rules-title">
+        <button class="rules-close-btn" id="rules-close-btn" aria-label="Close game info">×</button>
+        <h2 class="rules-title" id="rules-title">Game Info</h2>
+
+        <section class="rules-section">
+          <h3>Multipliers</h3>
+          <div class="rules-table">
+            <div class="rules-row"><span>HEADS</span><strong>1:1</strong></div>
+            <div class="rules-row"><span>TAILS</span><strong>1:1</strong></div>
+            <div class="rules-row"><span>5 MISMATCHED</span><strong>28:1</strong></div>
+          </div>
+        </section>
+
+        <section class="rules-section">
+          <h3>Game Modes</h3>
+          <p>Choose HEADS or TAILS for even-money play, or choose 5 MISMATCHED for the long-shot round that pays on five consecutive mismatches.</p>
+        </section>
+
+        <section class="rules-section">
+          <h3>Round Flow</h3>
+          <p>If both coins land heads, HEADS wins. If both coins land tails, TAILS wins. If one coin lands heads and the other tails, the result is MISMATCHED and the coins are tossed again. Five consecutive mismatches produce ODDED OUT.</p>
+        </section>
+
+        <section class="rules-section">
+          <h3>Button Guide</h3>
+          <ul class="rules-list">
+            <li>COME IN, SPINNER!: Starts the next round with the selected play.</li>
+            <li>Bet buttons: Choose HEADS, TAILS, or 5 MISMATCHED.</li>
+            <li>Quick amount buttons: Set 1, 10, 50, 100, or MAX instantly.</li>
+            <li>Provably Fair: Review seed information and rotate seeds between rounds.</li>
+          </ul>
+        </section>
+
+        <section class="rules-section">
+          <h3>RTP & Max Award</h3>
+          <p>HEADS and TAILS modes target 96.875% RTP. 5 MISMATCHED targets 90.625% RTP. Maximum theoretical award is 28x the selected amount, or ${amountAtMax} at the current top quick-select amount.</p>
+        </section>
+
+        <section class="rules-section">
+          <h3>Disclaimer</h3>
+          <p>${disclaimerTitle} A consistent internet connection is required. In the event of a disconnection, reload the game to finish any uncompleted rounds. The expected return is calculated over many rounds. Animations are not representative of any physical device, and are for illustrative purposes only. TM and © 2026 Stake Engine.</p>
+        </section>
+      </div>
+    </div>
+  `;
+}
+
+function getInputStep(currency) {
+  const decimals = CURRENCY_META[currency]?.decimals ?? 2;
+  if (decimals <= 0) return '1';
+  return (1 / (10 ** decimals)).toFixed(decimals);
+}
+
+function formatInputUnits(units, currency) {
+  const decimals = CURRENCY_META[currency]?.decimals ?? 2;
+  return Number(units).toFixed(decimals);
+}
+
+const REPLAY_STORAGE_KEY = 'dmd-replays-v1';
+const SOUND_STORAGE_KEY = 'dmd-sound-muted';
+
+function loadStoredReplays() {
+  try {
+    const raw = window.localStorage.getItem(REPLAY_STORAGE_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveReplayRound(roundData) {
+  try {
+    const next = loadStoredReplays().filter(entry => entry.eventId !== roundData.eventId);
+    next.unshift(roundData);
+    window.localStorage.setItem(REPLAY_STORAGE_KEY, JSON.stringify(next.slice(0, 50)));
+  } catch {
+    // Replay persistence is best-effort only.
+  }
+}
+
+function getStoredReplay(eventId) {
+  return loadStoredReplays().find(entry => entry.eventId === eventId) ?? null;
+}
+
+function buildReplayRound(roundData, replayContext) {
+  const displayBetAmount = replayContext.amount && replayContext.amount > 0
+    ? Math.round(replayContext.amount * MICRO_UNITS)
+    : roundData.betAmount;
+  const profitScale = roundData.betAmount > 0 ? displayBetAmount / roundData.betAmount : 1;
+  const startBalance = replayContext.balance != null
+    ? Math.round(replayContext.balance * MICRO_UNITS)
+    : roundData.startBalance;
+
+  return {
+    ...roundData,
+    betAmount: displayBetAmount,
+    profit: Math.round(roundData.profit * profitScale),
+    startBalance,
+    balance: startBalance + Math.round(roundData.profit * profitScale),
+  };
+}
+
+function buildReplayBannerHTML() {
+  return `
+    <div class="replay-banner hidden" id="replay-banner">
+      <div class="replay-banner__text" id="replay-banner-text"></div>
+      <button class="replay-repeat-btn hidden" id="replay-repeat-btn">REPLAY SAME EVENT</button>
+    </div>
+  `;
+}
+
+function buildSoundToggleHTML() {
+  return `<button class="sound-toggle" id="sound-toggle" aria-pressed="false">SOUND ON</button>`;
+}
+
+function buildBetIconHTML(betType) {
+  if (betType === BetType.HEADS) {
+    return `
+      <span class="bet-btn-icon bet-btn-icon--coin" aria-hidden="true">
+        <img src="/assets/coin-heads.png" alt="" draggable="false" />
+      </span>
+    `;
+  }
+
+  if (betType === BetType.TAILS) {
+    return `
+      <span class="bet-btn-icon bet-btn-icon--coin" aria-hidden="true">
+        <img src="/assets/coin-tails.png" alt="" draggable="false" />
+      </span>
+    `;
+  }
+
+  return `
+    <span class="bet-btn-icon bet-btn-icon--pair" aria-hidden="true">
+      <img src="/assets/coin-heads.png" alt="" draggable="false" />
+      <img src="/assets/coin-tails.png" alt="" draggable="false" />
+    </span>
+  `;
+}
+
+function buildBetLabelHTML(betType) {
+  if (betType === BetType.FIVE_ODDS) {
+    return `
+      <span class="bet-btn-label bet-btn-label--mismatch">
+        <span class="bet-btn-count">5</span>
+        <span class="bet-btn-copy">Mismatch</span>
+      </span>
+    `;
+  }
+
+  return `<span class="bet-btn-label">${betType}</span>`;
 }
 
 // --- Quotes ---
@@ -32,22 +225,22 @@ const CAPTAIN_QUOTES = {
     "Down to the depths with yer doubloons! Try again!",
   ],
   ODDS: [
-    "ODDS! The kip demands another toss — come in spinner!",
-    "One of each! Toss again ye miserable wretch!",
-    "Neither heads nor tails! The coins mock ye!",
-    "ODDS! The ring is not satisfied yet — spin again!",
+    "MISMATCHED! The kip demands another toss — come in spinner!",
+    "One of each! The coins are mismatched — toss again ye wretch!",
+    "Neither heads nor tails! Mismatched — the coins mock ye!",
+    "MISMATCHED! The ring is not satisfied yet — spin again!",
   ],
   ODDED_OUT: [
-    "FIVE ODDS! THE CURSE OF THE KIP FALLS UPON YE!",
-    "Five consecutive odds! Davy Jones himself smiles tonight!",
-    "THE ANCIENT CURSE! Five odds in a row — RUN YE FOOL!",
-    "FIVE ODDS! The kip has spoken — YE ARE CURSED, SCALLYWAG!",
+    "FIVE MISMATCHES! THE CURSE OF THE KIP FALLS UPON YE!",
+    "Five consecutive mismatches! Davy Jones himself smiles tonight!",
+    "THE ANCIENT CURSE! Five mismatches in a row — RUN YE FOOL!",
+    "FIVE MISMATCHES! The kip has spoken — YE ARE CURSED, SCALLYWAG!",
   ],
   IDLE: [
-    "Place yer bets and come in, spinner!",
+    "Choose yer fate and come in, spinner!",
     "The doubloons await... if ye dare.",
     "Toss the coins! Fortune or folly awaits thee!",
-    "Are ye a coward or a pirate? PLACE YER BET!",
+    "Are ye a coward or a pirate? STEP TO THE KIP!",
     "The ring is ready — step forward, Spinner!",
     "Choose yer fate, ye bold sea dog!",
   ],
@@ -56,8 +249,8 @@ const CAPTAIN_QUOTES = {
 const PARROT_QUOTES = {
   WIN:       ['"Pieces of eight!"', '"Gold fer us, lad!"', '"Strike it rich! SQUAWK!"'],
   LOSS:      ['"Davy Jones! SQUAWK!"', '"Walk the plank..."', '"Rough seas ahead..."'],
-  ODDS:      ['"Again! AGAIN! KRAWWWK!"', '"Spin it, scurvy dog!"', '"One of each! SQUAWK!"'],
-  ODDED_OUT: ['"CURSE! THE CURSE! SQUAWK!"', '"Five odds! DOOMED! KRAWWWK!"'],
+  ODDS:      ['"Again! Mismatched! KRAWWWK!"', '"Spin it, scurvy dog!"', '"One of each! SQUAWK!"'],
+  ODDED_OUT: ['"CURSE! THE CURSE! SQUAWK!"', '"Five mismatches! DOOMED! KRAWWWK!"'],
 };
 
 function randomFrom(arr) {
@@ -76,39 +269,132 @@ const SKULL_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 
 </svg>`;
 
 const COIN_HEADS_SVG = `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-  <path d="M30 44 L30 29 L43 35 L60 23 L77 35 L90 29 L90 44 Z" fill="#C8860A" stroke="#FFD700" stroke-width="1.2"/>
-  <circle cx="60" cy="23" r="4.5" fill="#FFD700"/>
-  <circle cx="32" cy="31" r="3.5" fill="#FFD700"/>
-  <circle cx="88" cy="31" r="3.5" fill="#FFD700"/>
-  <ellipse cx="60" cy="70" rx="27" ry="25" fill="#F5ECD7"/>
-  <ellipse cx="49" cy="66" rx="7.5" ry="8.5" fill="#2C1A0E"/>
-  <ellipse cx="71" cy="66" rx="7.5" ry="8.5" fill="#2C1A0E"/>
-  <circle cx="47" cy="64" r="2" fill="rgba(255,255,255,0.2)"/>
-  <circle cx="69" cy="64" r="2" fill="rgba(255,255,255,0.2)"/>
-  <path d="M55 78 L60 86 L65 78 Z" fill="#2C1A0E"/>
-  <rect x="42" y="87" width="36" height="11" rx="3" fill="#F5ECD7" stroke="#2C1A0E" stroke-width="0.8"/>
-  <line x1="48.5" y1="87" x2="48.5" y2="98" stroke="#2C1A0E" stroke-width="1.2"/>
-  <line x1="55" y1="87" x2="55" y2="98" stroke="#2C1A0E" stroke-width="1.2"/>
-  <line x1="60" y1="87" x2="60" y2="98" stroke="#2C1A0E" stroke-width="1.2"/>
-  <line x1="65" y1="87" x2="65" y2="98" stroke="#2C1A0E" stroke-width="1.2"/>
-  <line x1="71.5" y1="87" x2="71.5" y2="98" stroke="#2C1A0E" stroke-width="1.2"/>
-  <text x="60" y="115" text-anchor="middle" font-family="'Pirata One',cursive" font-size="11" fill="#2C1A0E" letter-spacing="2">HEADS</text>
+  <defs>
+    <radialGradient id="hg" cx="40%" cy="35%" r="65%">
+      <stop offset="0%"   stop-color="#FFF0A0"/>
+      <stop offset="30%"  stop-color="#E8B840"/>
+      <stop offset="65%"  stop-color="#B8860B"/>
+      <stop offset="100%" stop-color="#7A5200"/>
+    </radialGradient>
+    <radialGradient id="hr" cx="50%" cy="50%" r="50%">
+      <stop offset="70%"  stop-color="#9A6A00" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#5A3800" stop-opacity="0.9"/>
+    </radialGradient>
+    <filter id="hrough">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" result="noise"/>
+      <feColorMatrix type="saturate" values="0" in="noise" result="grey"/>
+      <feBlend in="SourceGraphic" in2="grey" mode="multiply" result="blend"/>
+      <feComponentTransfer in="blend">
+        <feFuncA type="linear" slope="1"/>
+      </feComponentTransfer>
+    </filter>
+    <clipPath id="hclip"><circle cx="60" cy="60" r="54"/></clipPath>
+  </defs>
+  <!-- Base coin -->
+  <circle cx="60" cy="60" r="57" fill="#6B4A00"/>
+  <circle cx="60" cy="60" r="54" fill="url(#hg)"/>
+  <!-- Worn patina patches -->
+  <ellipse cx="35" cy="42" rx="9" ry="7" fill="#9A7020" opacity="0.35" clip-path="url(#hclip)"/>
+  <ellipse cx="88" cy="78" rx="8" ry="6" fill="#9A7020" opacity="0.3" clip-path="url(#hclip)"/>
+  <ellipse cx="70" cy="30" rx="6" ry="5" fill="#C8A840" opacity="0.4" clip-path="url(#hclip)"/>
+  <!-- Raised rim -->
+  <circle cx="60" cy="60" r="54" fill="none" stroke="#5A3800" stroke-width="3.5" opacity="0.6"/>
+  <circle cx="60" cy="60" r="50" fill="none" stroke="#FFE070" stroke-width="1" opacity="0.5"/>
+  <!-- Rim inscription (arcs) -->
+  <path id="htarc" d="M 60 60 m -43 0 a 43 43 0 1 1 86 0" fill="none"/>
+  <text font-family="serif" font-size="6.5" fill="#5A3800" opacity="0.85" letter-spacing="1.8">
+    <textPath href="#htarc">✦ DEAD MEN'S DOUBLOONS ✦ ANNO DOMINI</textPath>
+  </text>
+  <!-- Portrait profile — regal bust facing right -->
+  <!-- Neck/shoulder base -->
+  <path d="M44 95 Q52 88 60 86 Q68 88 76 95 L80 102 L40 102 Z" fill="#C8860A" opacity="0.7"/>
+  <!-- Head -->
+  <ellipse cx="60" cy="66" rx="18" ry="21" fill="#D4960C"/>
+  <!-- Crown -->
+  <path d="M42 58 L44 50 L49 56 L55 44 L60 52 L65 44 L71 56 L76 50 L78 58 Z" fill="#B8780A" stroke="#FFE070" stroke-width="0.8"/>
+  <!-- Crown jewels -->
+  <circle cx="55" cy="47" r="2.2" fill="#FFE070"/>
+  <circle cx="60" cy="53" r="2.5" fill="#FFF0A0"/>
+  <circle cx="65" cy="47" r="2.2" fill="#FFE070"/>
+  <!-- Face details -->
+  <ellipse cx="55" cy="64" rx="3.5" ry="3" fill="#B87010" opacity="0.6"/>
+  <ellipse cx="65" cy="64" rx="3.5" ry="3" fill="#B87010" opacity="0.6"/>
+  <!-- Eye highlights -->
+  <circle cx="54" cy="63" r="1" fill="#FFE090" opacity="0.5"/>
+  <circle cx="64" cy="63" r="1" fill="#FFE090" opacity="0.5"/>
+  <!-- Nose bridge -->
+  <path d="M59 67 Q60 72 61 67" fill="none" stroke="#9A6A00" stroke-width="1.2"/>
+  <!-- Mouth -->
+  <path d="M55 76 Q60 79 65 76" fill="none" stroke="#9A6A00" stroke-width="1.3"/>
+  <!-- Chin shadow -->
+  <ellipse cx="60" cy="84" rx="10" ry="4" fill="#9A6A00" opacity="0.3"/>
+  <!-- Coin sheen -->
+  <ellipse cx="44" cy="46" rx="12" ry="8" fill="white" opacity="0.12" transform="rotate(-25 44 46)"/>
+  <!-- Rim shadow -->
+  <circle cx="60" cy="60" r="54" fill="url(#hr)"/>
 </svg>`;
 
 const COIN_TAILS_SVG = `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-  <line x1="24" y1="28" x2="83" y2="84" stroke="#C8860A" stroke-width="7" stroke-linecap="round"/>
-  <rect x="17" y="40" width="22" height="5" rx="2.5" fill="#2C1A0E" transform="rotate(45 28 42.5)"/>
-  <circle cx="24" cy="28" r="5" fill="#2C1A0E"/>
-  <line x1="96" y1="28" x2="37" y2="84" stroke="#C8860A" stroke-width="7" stroke-linecap="round"/>
-  <rect x="81" y="40" width="22" height="5" rx="2.5" fill="#2C1A0E" transform="rotate(-45 92 42.5)"/>
-  <circle cx="96" cy="28" r="5" fill="#2C1A0E"/>
-  <circle cx="60" cy="38" r="9" fill="none" stroke="#0D1B2A" stroke-width="3.5"/>
-  <line x1="60" y1="47" x2="60" y2="84" stroke="#0D1B2A" stroke-width="4"/>
-  <line x1="43" y1="59" x2="77" y2="59" stroke="#0D1B2A" stroke-width="4"/>
-  <path d="M43 82 Q52 95 60 86 Q68 95 77 82" fill="none" stroke="#0D1B2A" stroke-width="4"/>
-  <circle cx="43" cy="82" r="4.5" fill="#FFD700"/>
-  <circle cx="77" cy="82" r="4.5" fill="#FFD700"/>
-  <text x="60" y="115" text-anchor="middle" font-family="'Pirata One',cursive" font-size="11" fill="#2C1A0E" letter-spacing="2">TAILS</text>
+  <defs>
+    <radialGradient id="tg" cx="55%" cy="40%" r="62%">
+      <stop offset="0%"   stop-color="#F0E080"/>
+      <stop offset="28%"  stop-color="#D4A020"/>
+      <stop offset="68%"  stop-color="#A07010"/>
+      <stop offset="100%" stop-color="#6A4400"/>
+    </radialGradient>
+    <radialGradient id="tr" cx="50%" cy="50%" r="50%">
+      <stop offset="70%"  stop-color="#9A6A00" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#5A3800" stop-opacity="0.9"/>
+    </radialGradient>
+    <clipPath id="tclip"><circle cx="60" cy="60" r="54"/></clipPath>
+  </defs>
+  <!-- Base coin -->
+  <circle cx="60" cy="60" r="57" fill="#6B4A00"/>
+  <circle cx="60" cy="60" r="54" fill="url(#tg)"/>
+  <!-- Worn patina patches -->
+  <ellipse cx="82" cy="38" rx="8" ry="6" fill="#9A7020" opacity="0.3" clip-path="url(#tclip)"/>
+  <ellipse cx="30" cy="75" rx="7" ry="5" fill="#9A7020" opacity="0.28" clip-path="url(#tclip)"/>
+  <ellipse cx="72" cy="88" rx="6" ry="5" fill="#C8A840" opacity="0.35" clip-path="url(#tclip)"/>
+  <!-- Raised rim -->
+  <circle cx="60" cy="60" r="54" fill="none" stroke="#5A3800" stroke-width="3.5" opacity="0.6"/>
+  <circle cx="60" cy="60" r="50" fill="none" stroke="#FFE070" stroke-width="1" opacity="0.5"/>
+  <!-- Rim inscription -->
+  <path id="ttarc" d="M 60 60 m -43 0 a 43 43 0 1 1 86 0" fill="none"/>
+  <text font-family="serif" font-size="6.5" fill="#5A3800" opacity="0.85" letter-spacing="1.8">
+    <textPath href="#ttarc">✦ ANNO DOMINI MDCCXLVII ✦ HISPANIA</textPath>
+  </text>
+  <!-- Quartered coat of arms cross -->
+  <!-- Vertical bar -->
+  <rect x="55" y="22" width="10" height="76" rx="2" fill="#B8780A" opacity="0.85"/>
+  <!-- Horizontal bar -->
+  <rect x="22" y="55" width="76" height="10" rx="2" fill="#B8780A" opacity="0.85"/>
+  <!-- Cross highlight -->
+  <rect x="56.5" y="22" width="2" height="76" rx="1" fill="#FFE070" opacity="0.35"/>
+  <rect x="22" y="56.5" width="76" height="2" rx="1" fill="#FFE070" opacity="0.35"/>
+  <!-- Four quadrant emblems -->
+  <!-- Q1 top-left: castle tower -->
+  <rect x="35" y="32" width="14" height="16" rx="1" fill="#9A6A00" opacity="0.8"/>
+  <rect x="33" y="29" width="5" height="6" rx="1" fill="#9A6A00" opacity="0.8"/>
+  <rect x="40" y="29" width="5" height="6" rx="1" fill="#9A6A00" opacity="0.8"/>
+  <rect x="38" y="38" width="4" height="10" rx="1" fill="#6A4400" opacity="0.6"/>
+  <!-- Q2 top-right: rampant lion (simplified) -->
+  <ellipse cx="82" cy="34" rx="7" ry="8" fill="#9A6A00" opacity="0.75"/>
+  <ellipse cx="78" cy="30" rx="4" ry="4" fill="#B88020" opacity="0.8"/>
+  <path d="M75 38 Q79 46 83 42 Q87 46 83 50" fill="none" stroke="#9A6A00" stroke-width="2.5" opacity="0.7"/>
+  <!-- Q3 bottom-left: anchor -->
+  <circle cx="38" cy="74" r="5" fill="none" stroke="#9A6A00" stroke-width="2.2" opacity="0.8"/>
+  <line x1="38" y1="79" x2="38" y2="92" stroke="#9A6A00" stroke-width="2.2" opacity="0.8"/>
+  <line x1="30" y1="90" x2="46" y2="90" stroke="#9A6A00" stroke-width="2" opacity="0.8"/>
+  <path d="M30 90 Q34 95 38 92 Q42 95 46 90" fill="none" stroke="#9A6A00" stroke-width="2" opacity="0.8"/>
+  <!-- Q4 bottom-right: six-point star -->
+  <polygon points="82,72 84.3,78 90.6,78 85.7,82 87.5,88.3 82,85 76.5,88.3 78.3,82 73.4,78 79.7,78" fill="#9A6A00" opacity="0.75"/>
+  <!-- Centre boss -->
+  <circle cx="60" cy="60" r="7" fill="#C8900A" stroke="#FFE070" stroke-width="1.2" opacity="0.9"/>
+  <circle cx="60" cy="60" r="4" fill="#FFE070" opacity="0.6"/>
+  <!-- Coin sheen -->
+  <ellipse cx="46" cy="44" rx="11" ry="7" fill="white" opacity="0.12" transform="rotate(-25 46 44)"/>
+  <!-- Rim shadow -->
+  <circle cx="60" cy="60" r="54" fill="url(#tr)"/>
 </svg>`;
 
 const SHIP_SVG = `<svg viewBox="0 0 500 120" xmlns="http://www.w3.org/2000/svg">
@@ -123,13 +409,15 @@ const SHIP_SVG = `<svg viewBox="0 0 500 120" xmlns="http://www.w3.org/2000/svg">
 </svg>`;
 
 // --- HTML Builder ---
-function buildGameHTML(currency, balance) {
+function buildGameHTML(currency, balance, uiCopy) {
   const skullsHTML = Array.from({ length: 5 }, (_, i) =>
     `<span class="skull-icon" data-index="${i}">${SKULL_ICON_SVG}</span>`
   ).join('');
 
   return `
 <div class="game-root">
+
+  ${buildReplayBannerHTML()}
 
   <div class="cavern-bg">
     <div class="vignette"></div>
@@ -138,64 +426,47 @@ function buildGameHTML(currency, balance) {
 
   <div class="ship-silhouette">${SHIP_SVG}</div>
 
-  <div class="torch torch--left">
-    <div class="torch-bracket"></div>
-    <div class="torch-body">
-      <div class="torch-flame"><div class="flame-inner"></div></div>
-    </div>
-    <div class="torch-glow"></div>
-  </div>
-  <div class="torch torch--right">
-    <div class="torch-bracket"></div>
-    <div class="torch-body">
-      <div class="torch-flame"><div class="flame-inner"></div></div>
-    </div>
-    <div class="torch-glow"></div>
-  </div>
-
   <div class="parrot-zone" id="parrot-zone">
     <div class="speech-bubble parrot-bubble" id="parrot-bubble"></div>
     <div class="parrot" id="parrot">&#x1F99C;</div>
   </div>
 
   <header class="game-header">
-    <span class="header-ornament">&#x2693;</span>
-    <h1 class="game-title">Dead Men&rsquo;s Doubloons</h1>
-    <p class="game-subtitle">Come in, Spinner &mdash; if ye dare.</p>
     <div class="balance-bar">
-      <div class="balance-display">&#x1F4B0; <span id="balance-value">${balance.toLocaleString()} ${currency}</span></div>
+      <div class="balance-display">&#x1F4B0; <span id="balance-value">${formatDisplayUnits(balance, currency)}</span></div>
       <div class="session-id" id="session-display"></div>
+      ${buildSoundToggleHTML()}
     </div>
   </header>
 
   <main class="game-layout">
 
     <aside class="betting-panel">
-      <h2 class="panel-title">&#x2694;&#xFE0F; Place Yer Bets</h2>
+      <h2 class="panel-title">&#x2694;&#xFE0F; ${uiCopy.panelTitle}</h2>
 
       <div class="bet-type-selector" id="bet-type-selector">
         <button class="bet-btn bet-btn--heads active" data-bet="HEADS">
-          <span class="bet-btn-icon">&#x1F480;</span>
-          <span class="bet-btn-label">HEADS</span>
+          ${buildBetIconHTML(BetType.HEADS)}
+          ${buildBetLabelHTML(BetType.HEADS)}
           <span class="bet-btn-odds">1:1</span>
         </button>
         <button class="bet-btn bet-btn--tails" data-bet="TAILS">
-          <span class="bet-btn-icon">&#x2693;</span>
-          <span class="bet-btn-label">TAILS</span>
+          ${buildBetIconHTML(BetType.TAILS)}
+          ${buildBetLabelHTML(BetType.TAILS)}
           <span class="bet-btn-odds">1:1</span>
         </button>
         <button class="bet-btn bet-btn--odds" data-bet="FIVE_ODDS">
-          <span class="bet-btn-icon">&#x1F52E;</span>
-          <span class="bet-btn-label">5 ODDS</span>
+          ${buildBetIconHTML(BetType.FIVE_ODDS)}
+          ${buildBetLabelHTML(BetType.FIVE_ODDS)}
           <span class="bet-btn-odds">28:1</span>
         </button>
       </div>
 
       <div class="stake-section">
-        <label class="stake-label">Yer Wager:</label>
+        <label class="stake-label">${uiCopy.stakeLabel}</label>
         <div class="stake-input-row">
           <input type="number" id="stake-input" class="stake-input"
-            min="1" step="1" value="10" autocomplete="off" />
+            min="${getInputStep(currency)}" step="${getInputStep(currency)}" value="10" autocomplete="off" />
           <span class="stake-currency-label" id="stake-currency-label">${currency}</span>
         </div>
         <div class="quick-stakes">
@@ -208,12 +479,12 @@ function buildGameHTML(currency, balance) {
       </div>
 
       <div class="potential-win-row">
-        <span class="potential-win-label">Potential Win:</span>
-        <span class="potential-win-value" id="potential-win-value">20 ${currency}</span>
+        <span class="potential-win-label">${uiCopy.potentialLabel}</span>
+        <span class="potential-win-value" id="potential-win-value">${formatDisplayUnits(20, currency)}</span>
       </div>
 
       <div class="odds-streak-section">
-        <div class="odds-streak-title">&#x26A0;&#xFE0F; Odds Streak</div>
+        <div class="odds-streak-title">&#x26A0;&#xFE0F; Mismatch Streak</div>
         <div class="skulls-row" id="skulls-row">${skullsHTML}</div>
         <div class="odds-count-display" id="odds-count-display">0 of 5</div>
       </div>
@@ -233,6 +504,8 @@ function buildGameHTML(currency, balance) {
           <button class="seed-btn" id="rotate-seed-btn">&#x1F504; Rotate Seeds</button>
         </div>
       </details>
+
+      <button class="info-btn" id="info-btn">&#x2139; Game Info</button>
     </aside>
 
     <section class="spin-arena">
@@ -240,30 +513,25 @@ function buildGameHTML(currency, balance) {
       <div class="captain-zone" id="captain-zone">
         <div class="captain" id="captain">&#x1F3F4;&#x200D;&#x2620;&#xFE0F;</div>
         <div class="speech-bubble captain-bubble" id="captain-bubble">
-          Place yer bets and come in, spinner!
+          ${uiCopy.idlePrompt}
         </div>
       </div>
 
       <div class="ring-container">
-        <div class="sand-ring">
-          <div class="ring-text-arc">R &nbsp; I &nbsp; N &nbsp; G</div>
-          <div class="kip">
-            <div class="kip-plank">
-              <div class="coins-on-kip">
-                <div class="coin" id="coin-1">
-                  <div class="coin-inner" id="coin-1-inner">
-                    <div class="coin-face coin-face--front">${COIN_HEADS_SVG}</div>
-                    <div class="coin-face coin-face--back">${COIN_TAILS_SVG}</div>
-                  </div>
-                  <div class="coin-shadow" id="coin-1-shadow"></div>
+        <div class="gameboard">
+          <div class="kip-area">
+            <div class="coins-on-kip">
+              <div class="coin" id="coin-1">
+                <div class="coin-inner" id="coin-1-inner">
+                  <div class="coin-face"><img class="coin-img" src="/assets/coin-heads.png" alt="" draggable="false"></div>
                 </div>
-                <div class="coin" id="coin-2">
-                  <div class="coin-inner" id="coin-2-inner">
-                    <div class="coin-face coin-face--front">${COIN_HEADS_SVG}</div>
-                    <div class="coin-face coin-face--back">${COIN_TAILS_SVG}</div>
-                  </div>
-                  <div class="coin-shadow" id="coin-2-shadow"></div>
+                <div class="coin-shadow" id="coin-1-shadow"></div>
+              </div>
+              <div class="coin" id="coin-2">
+                <div class="coin-inner" id="coin-2-inner">
+                  <div class="coin-face"><img class="coin-img" src="/assets/coin-heads.png" alt="" draggable="false"></div>
                 </div>
+                <div class="coin-shadow" id="coin-2-shadow"></div>
               </div>
             </div>
           </div>
@@ -280,40 +548,30 @@ function buildGameHTML(currency, balance) {
 
       <div class="play-btn-wrapper">
         <button class="play-btn" id="play-btn">
-          <span class="play-btn-text">COME IN, SPINNER!</span>
+          <span class="play-btn-text" id="play-btn-text">PLAY</span>
           <span class="spacebar-hint">[SPACE]</span>
         </button>
         <div class="error-message" id="error-message"></div>
       </div>
 
     </section>
+
+    <aside class="voyage-log-panel">
+      <h3 class="voyage-log-title">&#x1F4DC; Voyage Log</h3>
+      <div class="history-list" id="history-list">
+        <div class="history-empty">No voyages yet, scallywag.</div>
+      </div>
+    </aside>
+
   </main>
-
-  <div class="history-panel">
-    <h3 class="history-title">&#x1F4DC; Voyage Log</h3>
-    <div class="history-list" id="history-list">
-      <div class="history-empty">No voyages yet, scallywag.</div>
-    </div>
-  </div>
-
-  <div class="chest chest--left" id="chest-left">
-    <div class="chest-body">
-      <div class="chest-lid"></div>
-      <div class="chest-base"></div>
-    </div>
-  </div>
-  <div class="chest chest--right" id="chest-right">
-    <div class="chest-body">
-      <div class="chest-lid"></div>
-      <div class="chest-base"></div>
-    </div>
-  </div>
 
   <div class="screen-flash" id="screen-flash"></div>
 
   <footer class="game-footer">
-    <p class="malfunction-notice">Malfunction voids all pays and plays. Must be 18+ to play. Play responsibly.</p>
+    <p class="malfunction-notice">${uiCopy.disclaimer}</p>
   </footer>
+
+  ${buildRulesModalHTML(currency, uiCopy)}
 
 </div>`;
 }
@@ -327,20 +585,32 @@ const VALID_CURRENCIES = new Set([
 
 // --- Init ---
 const replayCtx = getReplayContext();
-const rawCurrency = (replayCtx.currency || '').toUpperCase();
+const storedReplay = replayCtx.replay ? getStoredReplay(replayCtx.replay) : null;
+const replayRound = storedReplay ? buildReplayRound(storedReplay, replayCtx) : null;
+const replayMissing = Boolean(replayCtx.replay && !replayRound);
+const isReplayMode = Boolean(replayRound);
+const isSocialMode = replayCtx.social || replayRound?.social === true;
+const uiCopy = getUiCopy(isSocialMode);
+const rawCurrency = (replayCtx.currency || replayRound?.currency || '').toUpperCase();
 const currency  = VALID_CURRENCIES.has(rawCurrency) ? rawCurrency : 'GC';
-const startBal  = replayCtx.balance ?? 1000;
+const startBal  = replayRound ? replayRound.startBalance / MICRO_UNITS : (replayCtx.balance ?? 1000);
 const game      = new TwoUpGame({ currency, startingBalance: startBal });
 
+if (replayCtx.language) {
+  document.documentElement.lang = replayCtx.language;
+}
+
 const app = document.getElementById('app');
-app.innerHTML = buildGameHTML(currency, startBal);
+app.innerHTML = buildGameHTML(currency, startBal, uiCopy);
 
 // --- DOM refs ---
 const $ = id => document.getElementById(id);
 const el = {
   balance:         $('balance-value'),
   sessionDisp:     $('session-display'),
+  soundToggle:     $('sound-toggle'),
   playBtn:         $('play-btn'),
+  playBtnText:     $('play-btn-text'),
   stakeInput:      $('stake-input'),
   potentialWin:    $('potential-win-value'),
   betSelector:     $('bet-type-selector'),
@@ -366,6 +636,12 @@ const el = {
   coin2Inner:      $('coin-2-inner'),
   coin1Shadow:     $('coin-1-shadow'),
   coin2Shadow:     $('coin-2-shadow'),
+  infoBtn:         $('info-btn'),
+  rulesBackdrop:   $('rules-backdrop'),
+  rulesCloseBtn:   $('rules-close-btn'),
+  replayBanner:    $('replay-banner'),
+  replayBannerText:$('replay-banner-text'),
+  replayRepeatBtn: $('replay-repeat-btn'),
 };
 
 // --- State ---
@@ -373,8 +649,11 @@ let selectedBet   = BetType.HEADS;
 let isSpinning    = false;
 let tossBuffer    = [];
 let pendingResult = null;
+let isRulesOpen   = false;
+let replayComplete = false;
+let isSoundMuted = window.sessionStorage.getItem(SOUND_STORAGE_KEY) === '1';
 
-el.sessionDisp.textContent  = `Session: ${game.sessionID}`;
+el.sessionDisp.textContent  = isReplayMode ? `Replay: ${replayRound.eventId}` : `Session: ${game.sessionID}`;
 el.clientSeedInput.value    = game.clientSeed;
 
 const hashPoller = setInterval(() => {
@@ -417,12 +696,10 @@ game.onError       = msg => showError(msg);
 
 // --- Bet type selection ---
 el.betSelector.addEventListener('click', e => {
+  if (isReplayMode) return;
   const btn = e.target.closest('.bet-btn');
   if (!btn || isSpinning) return;
-  el.betSelector.querySelectorAll('.bet-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  selectedBet = btn.dataset.bet;
-  updatePotentialWin();
+  setSelectedBet(btn.dataset.bet);
 });
 
 // --- Stake controls ---
@@ -430,9 +707,9 @@ el.stakeInput.addEventListener('input', updatePotentialWin);
 
 document.querySelectorAll('.quick-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    if (isSpinning) return;
+    if (isSpinning || isReplayMode) return;
     el.stakeInput.value = btn.dataset.stake === 'max'
-      ? String(Math.floor(game.balance / 1_000_000))
+      ? formatInputUnits(game.balance / MICRO_UNITS, currency)
       : btn.dataset.stake;
     updatePotentialWin();
   });
@@ -441,14 +718,100 @@ document.querySelectorAll('.quick-btn').forEach(btn => {
 function updatePotentialWin() {
   const stake  = parseFloat(el.stakeInput.value) || 0;
   const payout = selectedBet === BetType.FIVE_ODDS ? 28 : 1;
-  el.potentialWin.textContent = `${(stake * payout).toLocaleString()} ${currency}`;
+  el.potentialWin.textContent = formatDisplayUnits(stake * payout, currency);
+}
+
+function setSelectedBet(betType) {
+  el.betSelector.querySelectorAll('.bet-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.bet === betType);
+  });
+  selectedBet = betType;
+  updatePotentialWin();
+}
+
+function clearHistory() {
+  el.historyList.innerHTML = '';
+}
+
+function syncReplayUi() {
+  if (!isReplayMode) return;
+
+  el.replayBanner.classList.remove('hidden');
+  el.replayBannerText.textContent = `REPLAY MODE • ${replayRound.eventId} • ${replayRound.betType} • ${formatAmount(replayRound.betAmount, currency)}`;
+  el.replayRepeatBtn.classList.toggle('hidden', !replayComplete);
+  el.playBtnText.textContent = 'REPLAY EVENT';
+
+  [
+    ...el.betSelector.querySelectorAll('.bet-btn'),
+    ...document.querySelectorAll('.quick-btn'),
+    el.stakeInput,
+    el.clientSeedInput,
+    el.rotateSeedBtn,
+  ].forEach(control => {
+    control.disabled = true;
+  });
+}
+
+function updateSoundToggle() {
+  el.soundToggle.textContent = isSoundMuted ? 'SOUND OFF' : 'SOUND ON';
+  el.soundToggle.setAttribute('aria-pressed', String(isSoundMuted));
+}
+
+function applySoundPreference() {
+  if (isSoundMuted) sound.mute();
+  else sound.unmute();
+}
+
+async function presentRoundOutcome(roundData) {
+  const lastToss = roundData.tossDetails?.[roundData.tossDetails.length - 1] ?? null;
+  const isOddedOut = roundData.outcome === 'ODDED_OUT';
+  const wonFiveOdds = isOddedOut && roundData.betType === BetType.FIVE_ODDS && roundData.profit > 0;
+  const isWin = roundData.profit >= 0;
+  const bigWin = roundData.profit >= roundData.betAmount * 4;
+
+  if (wonFiveOdds) {
+    sound.bigWin();
+    await showResultBanner('FIVE ODDS! JACKPOT!', 'heads', 3200);
+    setCaptainMood('excited');
+    showCaptainSpeech(randomFrom(CAPTAIN_QUOTES.ODDED_OUT), 4200);
+    showParrotSpeech(randomFrom(PARROT_QUOTES.ODDED_OUT), 3500);
+    openChests();
+    return;
+  }
+
+  if (isOddedOut) {
+    sound.oddedOut();
+    await showResultBanner('ODDED OUT! CURSED!', 'odded', 3200);
+    setCaptainMood('angry');
+    showCaptainSpeech(randomFrom(CAPTAIN_QUOTES.ODDED_OUT), 4200);
+    showParrotSpeech(randomFrom(PARROT_QUOTES.ODDED_OUT), 3500);
+    triggerScreenShake();
+    return;
+  }
+
+  if (isWin) {
+    if (bigWin) { sound.bigWin(); openChests(); } else { sound.headsLand(); }
+    const label = lastToss ? lastToss.result : 'WIN';
+    await showResultBanner(`${label}! ${uiCopy.winBanner}`, 'heads', 2800);
+    setCaptainMood('excited');
+    showCaptainSpeech(randomFrom(CAPTAIN_QUOTES.WIN), 3800);
+    showParrotSpeech(randomFrom(PARROT_QUOTES.WIN), 3200);
+    return;
+  }
+
+  sound.lose();
+  const label = lastToss ? lastToss.result : 'LOSS';
+  await showResultBanner(`${label}! ${uiCopy.lossBanner}`, 'tails', 2500);
+  setCaptainMood('angry');
+  showCaptainSpeech(randomFrom(CAPTAIN_QUOTES.LOSS), 3800);
+  showParrotSpeech(randomFrom(PARROT_QUOTES.LOSS), 3200);
 }
 
 // --- Provably fair ---
 el.clientSeedInput.addEventListener('change', () => game.setClientSeed(el.clientSeedInput.value));
 
 el.rotateSeedBtn.addEventListener('click', async () => {
-  if (isSpinning) return;
+  if (isSpinning || isReplayMode) return;
   const result = await game.rotateServerSeed();
   if (result) {
     el.serverSeedHash.textContent = result.newHash.slice(0, 20) + '...';
@@ -459,8 +822,7 @@ el.rotateSeedBtn.addEventListener('click', async () => {
 
 // --- Balance display ---
 function updateBalance(microUnits) {
-  const v = Math.floor(microUnits / 1_000_000);
-  el.balance.textContent = `${v.toLocaleString()} ${currency}`;
+  el.balance.textContent = formatAmount(microUnits, currency);
 }
 
 // --- Skull tracker ---
@@ -504,6 +866,20 @@ function showError(msg) {
   errTimer = setTimeout(() => el.errorMsg.classList.remove('visible'), 3200);
 }
 
+function openRulesModal() {
+  isRulesOpen = true;
+  el.rulesBackdrop.classList.remove('hidden');
+  el.rulesBackdrop.setAttribute('aria-hidden', 'false');
+  el.rulesCloseBtn.focus();
+}
+
+function closeRulesModal() {
+  isRulesOpen = false;
+  el.rulesBackdrop.classList.add('hidden');
+  el.rulesBackdrop.setAttribute('aria-hidden', 'true');
+  el.infoBtn.focus();
+}
+
 // --- Result banner ---
 function showResultBanner(text, typeClass, ms = 2200) {
   el.resultText.textContent    = text;
@@ -541,21 +917,29 @@ function delay(ms) {
 }
 
 async function flipOneCoin(inner, shadow, coinResult) {
-  // H -> 1800deg (10x180, even multiple -> front face = HEADS)
-  // T -> 1980deg (11x180, odd multiple -> back face  = TAILS)
-  const finalY = coinResult === 'H' ? 1800 : 1980;
+  const DURATION = 1850;
+  const imgEl = inner.querySelector('.coin-img');
 
   inner.getAnimations().forEach(a => a.cancel());
   shadow.getAnimations().forEach(a => a.cancel());
 
+  // Reset to heads so the coin looks neutral before it launches
+  imgEl.src = '/assets/coin-heads.png';
+
+  // Swap the image at the blurry arc-peak so the result is hidden until landing
+  const swapTimer = setTimeout(() => {
+    imgEl.src = coinResult === 'H' ? '/assets/coin-heads.png' : '/assets/coin-tails.png';
+  }, DURATION * 0.48);
+
+  // Both heads and tails always land at 1800deg (front-face forward — no backface needed)
   const anim = inner.animate([
-    { transform: 'translateY(0px) rotateY(0deg) scale(1)',            filter: 'blur(0px)',   offset: 0    },
-    { transform: 'translateY(-35px) rotateY(270deg) scale(1.08)',     filter: 'blur(0px)',   offset: 0.07 },
-    { transform: 'translateY(-280px) rotateY(900deg) scale(0.82)',    filter: 'blur(2.5px)', offset: 0.44 },
-    { transform: 'translateY(-280px) rotateY(1440deg) scale(0.82)',   filter: 'blur(3px)',   offset: 0.56 },
-    { transform: 'translateY(-35px) rotateY(1700deg) scale(1.06)',    filter: 'blur(1px)',   offset: 0.87 },
-    { transform: `translateY(0px) rotateY(${finalY}deg) scale(1)`,   filter: 'blur(0px)',   offset: 1    },
-  ], { duration: 1850, easing: 'cubic-bezier(0.25,0.08,0.25,1)', fill: 'forwards' });
+    { transform: 'translateY(0px) rotateY(0deg) scale(1)',           filter: 'blur(0px)',   offset: 0    },
+    { transform: 'translateY(-35px) rotateY(270deg) scale(1.08)',    filter: 'blur(0px)',   offset: 0.07 },
+    { transform: 'translateY(-280px) rotateY(900deg) scale(0.82)',   filter: 'blur(2.5px)', offset: 0.44 },
+    { transform: 'translateY(-280px) rotateY(1440deg) scale(0.82)',  filter: 'blur(3px)',   offset: 0.56 },
+    { transform: 'translateY(-35px) rotateY(1700deg) scale(1.06)',   filter: 'blur(1px)',   offset: 0.87 },
+    { transform: 'translateY(0px) rotateY(1800deg) scale(1)',        filter: 'blur(0px)',   offset: 1    },
+  ], { duration: DURATION, easing: 'cubic-bezier(0.25,0.08,0.25,1)', fill: 'forwards' });
 
   shadow.animate([
     { transform: 'translateX(-50%) scaleX(1)',    opacity: 0.45, offset: 0    },
@@ -565,6 +949,9 @@ async function flipOneCoin(inner, shadow, coinResult) {
   ], { duration: 1850, easing: 'cubic-bezier(0.25,0.08,0.25,1)', fill: 'forwards' });
 
   await anim.finished;
+  clearTimeout(swapTimer);
+  // Guarantee correct face is shown after animation settles
+  imgEl.src = coinResult === 'H' ? '/assets/coin-heads.png' : '/assets/coin-tails.png';
 }
 
 async function animateToss(toss) {
@@ -583,7 +970,7 @@ async function animateToss(toss) {
 
   if (result === 'ODDS') {
     sound.oddsResult();
-    await showResultBanner('ODDS!', 'odds', 1300);
+    await showResultBanner('MISMATCHED!', 'odds', 1300);
     showCaptainSpeech(randomFrom(CAPTAIN_QUOTES.ODDS), 2200);
     showParrotSpeech(randomFrom(PARROT_QUOTES.ODDS), 2200);
     [el.coin1Inner, el.coin2Inner, el.coin1Shadow, el.coin2Shadow].forEach(el2 =>
@@ -603,11 +990,8 @@ function addHistoryEntry(roundData) {
   if (empty) empty.remove();
 
   const { round, betType, betAmount, tosses, outcome, profit, balance } = roundData;
-  const betU    = Math.floor(betAmount / 1_000_000);
-  const profU   = Math.floor(profit    / 1_000_000);
-  const balU    = Math.floor(balance   / 1_000_000);
-  const profStr = profU >= 0 ? `+${profU}` : String(profU);
-  const profCls = profU >= 0 ? 'profit-positive' : 'profit-negative';
+  const profCls = profit >= 0 ? 'profit-positive' : 'profit-negative';
+  const profStr = `${profit >= 0 ? '+' : '-'}${formatAmount(Math.abs(profit), currency)}`;
   const outCls  = outcome === 'HEADS'     ? 'outcome-heads' :
                   outcome === 'TAILS'     ? 'outcome-tails' :
                   outcome === 'ODDED_OUT' ? 'outcome-odded' : 'outcome-odds';
@@ -616,11 +1000,11 @@ function addHistoryEntry(roundData) {
   entry.className = 'history-entry';
   entry.innerHTML = `
     <span class="history-round">#${round}</span>
-    <span class="history-bet">${betType} ${betU} ${currency}</span>
+    <span class="history-bet">${betType} ${formatAmount(betAmount, currency)}</span>
     <span class="history-tosses">${tosses.join(' \u2192 ')}</span>
-    <span class="history-outcome ${outCls}">${outcome}</span>
-    <span class="history-profit ${profCls}">${profStr} ${currency}</span>
-    <span class="history-balance">${balU.toLocaleString()} ${currency}</span>
+    <span class="history-outcome ${outCls}">${outcome === 'ODDS' ? 'MISMATCHED' : outcome}</span>
+    <span class="history-profit ${profCls}">${profStr}</span>
+    <span class="history-balance">${formatAmount(balance, currency)}</span>
   `;
   el.historyList.insertBefore(entry, el.historyList.firstChild);
   requestAnimationFrame(() => requestAnimationFrame(() => entry.classList.add('history-entry--visible')));
@@ -629,18 +1013,64 @@ function addHistoryEntry(roundData) {
   if (entries.length > 10) entries[entries.length - 1].remove();
 }
 
+async function runReplayRound() {
+  if (!isReplayMode || isSpinning) return;
+
+  replayComplete = false;
+  syncReplayUi();
+  clearHistory();
+  setSkullCount(0);
+  updateBalance(replayRound.startBalance);
+  showCaptainSpeech(`Replaying event ${replayRound.eventId}`, 2600);
+  setCaptainMood('neutral');
+
+  isSpinning = true;
+  el.playBtn.disabled = true;
+  el.playBtn.classList.add('spinning');
+  el.errorMsg.classList.remove('visible');
+  el.tossCounter.style.display = 'none';
+
+  let oddsCount = 0;
+  for (const [index, toss] of replayRound.tossDetails.entries()) {
+    if (toss.result === 'ODDS') {
+      oddsCount++;
+      setSkullCount(oddsCount);
+    }
+    await animateToss({ c1: toss.coin1, c2: toss.coin2, result: toss.result, idx: index + 1 });
+  }
+
+  updateBalance(replayRound.balance);
+  await presentRoundOutcome(replayRound);
+  addHistoryEntry(replayRound);
+
+  replayComplete = true;
+  syncReplayUi();
+  el.tossCounter.style.display = 'none';
+  isSpinning = false;
+  el.playBtn.disabled = false;
+  el.playBtn.classList.remove('spinning');
+
+  [el.coin1Inner, el.coin2Inner, el.coin1Shadow, el.coin2Shadow].forEach(node =>
+    node.getAnimations().forEach(a => a.cancel())
+  );
+}
+
 // --- Main play handler ---
 async function handlePlay() {
+  if (isReplayMode) {
+    await runReplayRound();
+    return;
+  }
   if (isSpinning) return;
 
   const stakeVal = parseFloat(el.stakeInput.value);
   if (!stakeVal || stakeVal <= 0) {
-    showError('Enter a valid wager, ye scoundrel!');
+    showError(uiCopy.invalidAmountError);
     return;
   }
-  const stakeMicro = Math.round(stakeVal * 1_000_000);
+  const stakeMicro = Math.round(stakeVal * MICRO_UNITS);
   if (stakeMicro > game.balance) {
-    showError("Insufficient doubloons! Ye cannot bet what ye don't have!");
+    showError(uiCopy.insufficientBalanceError);
     return;
   }
 
@@ -676,47 +1106,15 @@ async function handlePlay() {
   // Authoritative balance
   updateBalance(game.balance);
 
-  // Show outcome
-  if (pendingResult) {
-    const lastToss    = tossBuffer[tossBuffer.length - 1];
-    const isOddedOut  = pendingResult.oddedOut === true;
-    const wonFiveOdds = isOddedOut && selectedBet === BetType.FIVE_ODDS;
-    const isWin       = pendingResult.type === 'win';
-    const bigWin      = isWin && pendingResult.profit >= stakeMicro * 4;
-
-    if (wonFiveOdds) {
-      sound.bigWin();
-      await showResultBanner('FIVE ODDS! JACKPOT!', 'heads', 3200);
-      setCaptainMood('excited');
-      showCaptainSpeech(randomFrom(CAPTAIN_QUOTES.ODDED_OUT), 4200);
-      showParrotSpeech(randomFrom(PARROT_QUOTES.ODDED_OUT), 3500);
-      openChests();
-    } else if (isOddedOut) {
-      sound.oddedOut();
-      await showResultBanner('ODDED OUT! CURSED!', 'odded', 3200);
-      setCaptainMood('angry');
-      showCaptainSpeech(randomFrom(CAPTAIN_QUOTES.ODDED_OUT), 4200);
-      showParrotSpeech(randomFrom(PARROT_QUOTES.ODDED_OUT), 3500);
-      triggerScreenShake();
-    } else if (isWin) {
-      if (bigWin) { sound.bigWin(); openChests(); } else { sound.headsLand(); }
-      const label = lastToss ? lastToss.result : 'WIN';
-      await showResultBanner(`${label}! YE WIN!`, 'heads', 2800);
-      setCaptainMood('excited');
-      showCaptainSpeech(randomFrom(CAPTAIN_QUOTES.WIN), 3800);
-      showParrotSpeech(randomFrom(PARROT_QUOTES.WIN), 3200);
-    } else {
-      sound.lose();
-      const label = lastToss ? lastToss.result : 'LOSS';
-      await showResultBanner(`${label}! YE LOSE!`, 'tails', 2500);
-      setCaptainMood('angry');
-      showCaptainSpeech(randomFrom(CAPTAIN_QUOTES.LOSS), 3800);
-      showParrotSpeech(randomFrom(PARROT_QUOTES.LOSS), 3200);
-    }
-  }
-
   if (game.roundHistory.length > 0) {
-    addHistoryEntry(game.roundHistory[0]);
+    const completedRound = game.roundHistory[0];
+    await presentRoundOutcome(completedRound);
+    addHistoryEntry(completedRound);
+    saveReplayRound({
+      ...completedRound,
+      currency,
+      social: isSocialMode,
+    });
   }
 
   el.tossCounter.style.display = 'none';
@@ -732,20 +1130,61 @@ async function handlePlay() {
 // --- Event wiring ---
 el.playBtn.addEventListener('click', () => { sound.buttonClick(); handlePlay(); });
 el.betSelector.addEventListener('click', () => sound.uiHover(), { capture: true });
+el.infoBtn.addEventListener('click', () => {
+  sound.uiHover();
+  openRulesModal();
+});
+el.rulesCloseBtn.addEventListener('click', closeRulesModal);
+el.rulesBackdrop.addEventListener('click', e => {
+  if (e.target === el.rulesBackdrop) closeRulesModal();
+});
+el.replayRepeatBtn.addEventListener('click', () => {
+  sound.buttonClick();
+  runReplayRound();
+});
+el.soundToggle.addEventListener('click', async () => {
+  await sound.init();
+  isSoundMuted = !isSoundMuted;
+  window.sessionStorage.setItem(SOUND_STORAGE_KEY, isSoundMuted ? '1' : '0');
+  applySoundPreference();
+  updateSoundToggle();
+});
 
 document.addEventListener('keydown', e => {
+  if (e.code === 'Escape' && isRulesOpen) {
+    e.preventDefault();
+    closeRulesModal();
+    return;
+  }
   if (e.code === 'Space' && !e.repeat) {
     e.preventDefault();
-    if (!isSpinning) handlePlay();
+    if (!isSpinning && !isRulesOpen && !isReplayMode) handlePlay();
   }
 });
 
 // --- Initial state ---
+if (isReplayMode) {
+  setSelectedBet(replayRound.betType);
+  el.stakeInput.value = formatInputUnits(replayRound.betAmount / MICRO_UNITS, currency);
+  updateBalance(replayRound.startBalance);
+  syncReplayUi();
+} else {
+  updateBalance(game.balance);
+}
+
 updatePotentialWin();
-updateBalance(game.balance);
+updateSoundToggle();
 setCaptainMood('neutral');
-showCaptainSpeech(randomFrom(CAPTAIN_QUOTES.IDLE), 3500);
+showCaptainSpeech(isReplayMode ? `Replay loaded: ${replayRound.eventId}` : uiCopy.idlePrompt, 3500);
+
+if (replayMissing) {
+  showError(`Replay ${replayCtx.replay} was not found on this device.`);
+}
+
+if (isReplayMode) {
+  setTimeout(() => { runReplayRound(); }, 250);
+}
 
 setInterval(() => {
-  if (!isSpinning) showCaptainSpeech(randomFrom(CAPTAIN_QUOTES.IDLE), 3500);
+  if (!isSpinning && !isReplayMode) showCaptainSpeech(randomFrom(CAPTAIN_QUOTES.IDLE), 3500);
 }, 9000);
