@@ -1,5 +1,5 @@
 /**
- * Dead Men's Doubloons — Two-Up Core Game Logic
+ * HeadsOrTails — Two-Up Core Game Logic
  * Stake Engine compliant, Provably Fair RNG, micro-unit wallet
  */
 
@@ -374,7 +374,7 @@ export class TwoUpGame {
   _makeSessionID() {
     const ts  = Date.now().toString(36).toUpperCase();
     const rnd = Math.random().toString(36).slice(2, 8).toUpperCase();
-    return `DMD-${ts}-${rnd}`;
+    return `HOT-${ts}-${rnd}`;
   }
 }
 

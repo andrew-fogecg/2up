@@ -1,14 +1,14 @@
-# Content Build Requirements — Dead Men's Doubloons
+# Content Build Requirements — HeadsOrTails
 
 **Author:** Stake Content Writer agent  
 **Date:** 2026-04-24  
-**Project:** Dead Men's Doubloons — pirate-themed Two-Up coin-toss game for Stake.US  
+**Project:** HeadsOrTails — pirate-themed Two-Up coin-toss game for Stake.US  
 
 ---
 
 ## What We Are Building
 
-A Stake.US submission package for **Dead Men's Doubloons**, a digital social-casino adaptation of the traditional Australian Two-Up coin-toss game. The game is built on the Stake Engine and submitted for Stake.US review.
+A Stake.US submission package for **HeadsOrTails**, a digital social-casino adaptation of the traditional Australian Two-Up coin-toss game. The game is built on the Stake Engine and submitted for Stake.US review.
 
 The primary content artifact is a submission-ready markdown document that packages all content required for Stake.US editorial and compliance review into a single file.
 
@@ -26,7 +26,7 @@ The primary content artifact is a submission-ready markdown document that packag
 
 | Field | Value |
 |---|---|
-| Official name | Dead Men's Doubloons |
+| Official name | HeadsOrTails |
 | Tagline | *Come in, Spinner — if ye dare.* |
 | Genre | Coin-toss / Two-Up |
 | Engine | Stake Engine |

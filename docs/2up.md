@@ -59,7 +59,7 @@ The rules are beautifully simple: a **Spinner** tosses two coins into the air fr
 
 ## Building the Pirate Two-Up Game
 
-### 🎯 Concept: "Dead Men's Doubloons"
+### 🎯 Concept: "HeadsOrTails"
 
 Theme: A **pirate treasure cove** setting. The "Boxer" is a one-eyed pirate captain. The coins are ancient gold doubloons. The kip is a driftwood plank. The ring is drawn in sand on the floor of a torchlit cavern.
 
@@ -163,7 +163,7 @@ PirateTwoUp (root)
 │   ├── GoldDustParticles
 │   └── WoodPlankTexture
 ├── GameHeader
-│   ├── TitleBanner ("Dead Men's Doubloons")
+│   ├── TitleBanner ("HeadsOrTails")
 │   └── PlayerWallet (💰 current balance)
 ├── BettingRing
 │   ├── BetSelector (Heads / Tails / Odds)

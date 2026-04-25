@@ -7,7 +7,7 @@ export default defineConfig({
   globalSetup: './tests/global-setup.js',
   globalTeardown: './tests/global-teardown.js',
   use: {
-    baseURL: 'http://127.0.0.1:4173',
+    baseURL: 'http://127.0.0.1:4193',
     headless: true,
   },
   projects: [
@@ -33,9 +33,9 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run preview -- --host 127.0.0.1 --port 4173',
-    port: 4173,
-    reuseExistingServer: true,
+    command: 'npm run preview -- --host 127.0.0.1 --port 4193',
+    port: 4193,
+    reuseExistingServer: false,
     timeout: 30_000,
   },
 });

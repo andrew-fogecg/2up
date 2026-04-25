@@ -1,6 +1,6 @@
-# Stake Game Template Blueprint
+# HeadsOrTails
 
-This repository now includes a runnable automation layer for an AI-assisted Stake game build blueprint. The system audits the required agents, validates the requirements and action documents, evaluates the math configuration, and writes build artifacts into `dist/`.
+This repository now includes a runnable automation layer for the HeadsOrTails Stake game build. The system audits the required agents, validates the requirements and action documents, evaluates the math configuration, and writes build artifacts into `dist/`.
 
 The implementation is aligned to the build-system specification and the repository content in `docs/Stake_.md`, `action.md`, and `.github/agents/`.
 
@@ -129,6 +129,7 @@ The current build generates these artifacts:
 | Output path | Contents |
 |---|---|
 | `dist/frontend/index.html` | Production frontend shell |
+| `dist/maths/index.json` | Publish manifest for Stake maths upload |
 | `dist/maths/math_report.json` | Math compliance report |
 | `dist/submission/generated_spec.md` | Detailed generated requirements explanation |
 | `dist/submission/assumptions_draft.md` | Draft assumptions inferred before build |
@@ -140,7 +141,7 @@ The current build generates these artifacts:
 | `dist/submission/requirements_audit.md` | Requirements audit snapshot |
 | `dist/submission/action_summary.md` | Action summary snapshot |
 | `dist/submission/stake_us_submission.md` | Submission-ready content draft |
-| `dist/submission/releases/stake-game-template-artifacts.zip` | Packaged release archive |
+| `dist/submission/releases/headsortails-artifacts.zip` | Packaged release archive |
 | `dist/submission/build_report.json` | Overall pipeline result |
 
 ## Automated Agent Flow

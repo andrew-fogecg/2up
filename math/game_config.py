@@ -7,7 +7,7 @@ from pathlib import Path
 
 GAME_CONFIG = {
     "metadata": {
-        "name": "Stake Game Template Blueprint",
+        "name": "HeadsOrTails",
         "target_audience": "Internal teams building Stake Engine games with AI-assisted workflows",
         "icon_concept": "A card deck fused with a circuit board to signal game math plus automation",
         "rng": "Provably Fair",
@@ -47,6 +47,7 @@ GAME_CONFIG = {
         "of any physical device, and are for illustrative purposes only. TM and © 2026 Stake Engine."
     ),
     "artifacts": {
+        "math_index": "dist/maths/index.json",
         "math_report": "dist/maths/math_report.json",
         "agent_inventory": "dist/submission/system/agent_inventory.json",
         "build_report": "dist/submission/build_report.json",

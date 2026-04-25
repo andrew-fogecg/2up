@@ -1,5 +1,5 @@
 /**
- * SoundEngine.js — Dead Men's Doubloons Pirate Two-Up
+ * SoundEngine.js — HeadsOrTails Pirate Two-Up
  * Stake Sound Engineer: Procedural Web Audio API sound engine.
  *
  * Audio Map:

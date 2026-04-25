@@ -49,7 +49,7 @@ export default async function globalTeardown() {
     <head>
       <meta charset="utf-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <title>Dead Men's Doubloons Test Review</title>
+      <title>HeadsOrTails Test Review</title>
       <style>
         body { margin: 0; font-family: Georgia, serif; background: #111821; color: #f3ead7; }
         main { width: min(1200px, calc(100% - 32px)); margin: 0 auto; padding: 24px 0 48px; }
@@ -67,7 +67,7 @@ export default async function globalTeardown() {
       <main>
         <section class="intro">
           <p class="eyebrow">Visual Review</p>
-          <h1>Dead Men's Doubloons Test Coverage Review</h1>
+          <h1>HeadsOrTails Test Coverage Review</h1>
           <p>Each card below shows a screenshot checkpoint captured during the Playwright run. Open this file in a browser after the suite finishes to inspect device coverage and round-flow states visually.</p>
         </section>
         ${groups.map(renderGroup).join('') || '<p>No screenshots were captured.</p>'}

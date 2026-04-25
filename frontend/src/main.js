@@ -120,8 +120,8 @@ function formatInputUnits(units, currency) {
     .replace(/\.0+$/, '');
 }
 
-const REPLAY_STORAGE_KEY = 'dmd-replays-v1';
-const SOUND_STORAGE_KEY = 'dmd-sound-muted';
+const REPLAY_STORAGE_KEY = 'headsortails-replays-v1';
+const SOUND_STORAGE_KEY = 'headsortails-sound-muted';
 
 function loadStoredReplays() {
   try {
@@ -309,7 +309,7 @@ const COIN_HEADS_SVG = `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000
   <!-- Rim inscription (arcs) -->
   <path id="htarc" d="M 60 60 m -43 0 a 43 43 0 1 1 86 0" fill="none"/>
   <text font-family="serif" font-size="6.5" fill="#5A3800" opacity="0.85" letter-spacing="1.8">
-    <textPath href="#htarc">✦ DEAD MEN'S DOUBLOONS ✦ ANNO DOMINI</textPath>
+    <textPath href="#htarc">✦ HEADSORTAILS ✦ STAKE ENGINE</textPath>
   </text>
   <!-- Portrait profile — regal bust facing right -->
   <!-- Neck/shoulder base -->

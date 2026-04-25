@@ -1,4 +1,4 @@
-# Dead Men's Doubloons Review Tasks
+# HeadsOrTails Review Tasks
 
 ## Completed
 

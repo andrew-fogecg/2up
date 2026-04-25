@@ -1,13 +1,13 @@
 {
-  "gameName": "Stake Game Template Blueprint",
-  "tagline": "A generated build shell for Stake Game Template Blueprint, produced from repository requirements and validated for Stake review.",
+  "gameName": "HeadsOrTails",
+  "tagline": "A generated build shell for HeadsOrTails, produced from repository requirements and validated for Stake review.",
   "iconConcept": "A modern deck-and-circuit emblem that communicates game logic, math, and automated delivery.",
   "coreMechanic": "5x3 reel-spin with line wins",
   "board": {
     "layout": "5x3 reel board",
     "primaryAction": "SPIN",
     "secondaryAction": "AUTO PLAY",
-    "summary": "Stake Game Template Blueprint uses a 5x3 layout with a clear primary action, review-ready help copy, and submission-friendly compliance panels."
+    "summary": "HeadsOrTails uses a 5x3 layout with a clear primary action, review-ready help copy, and submission-friendly compliance panels."
   },
   "buttonLabels": {
     "standard": {
@@ -26,7 +26,7 @@
   "helpSections": [
     {
       "title": "Game Flow",
-      "body": "Set the play amount, trigger the primary action, and review results for Stake Game Template Blueprint through the history tray and help drawer."
+      "body": "Set the play amount, trigger the primary action, and review results for HeadsOrTails through the history tray and help drawer."
     },
     {
       "title": "Requirements Summary",

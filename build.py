@@ -1,4 +1,4 @@
-"""Build entrypoint for the Stake game template blueprint."""
+"""Build entrypoint for the HeadsOrTails project."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ from build_system.pipeline import run_pipeline
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Run the Stake game template build pipeline.")
+    parser = argparse.ArgumentParser(description="Run the HeadsOrTails build pipeline.")
     parser.add_argument(
         "--strict",
         action="store_true",

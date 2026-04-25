@@ -1,4 +1,4 @@
-"""End-to-end build pipeline and agent orchestrator for the Stake game template blueprint."""
+"""End-to-end build pipeline and agent orchestrator for HeadsOrTails."""
 
 from __future__ import annotations
 
@@ -137,6 +137,107 @@ def _audit_action_items(action_path: Path) -> tuple[list[str], list[str], str]:
 def _write_json(path: Path, payload: dict | list) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+
+
+def _build_math_index(math_report: dict[str, object]) -> dict[str, object]:
+    return {
+        "format": "stake-engine-maths",
+        "version": 1,
+        "game": math_report["game"],
+        "entry": "math_report.json",
+        "files": [
+            "index.json",
+            "math_report.json",
+            "developer_summary.md",
+        ],
+        "configuration_compliant": math_report["configuration_compliant"],
+        "mode_names": [mode["name"] for mode in math_report["mode_reports"]],
+    }
+
+
+def _slugify_artifact_name(value: str) -> str:
+    slug = re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
+    return slug or "stake-game"
+
+
+def _validate_distribution_contract(
+    dist_dir: Path,
+    game_name: str,
+) -> tuple[list[str], dict[str, object]]:
+    issues: list[str] = []
+    frontend_index = dist_dir / "frontend" / "index.html"
+    maths_dir = dist_dir / "maths"
+    maths_index = maths_dir / "index.json"
+    maths_report = maths_dir / "math_report.json"
+    report: dict[str, object] = {
+        "game_name": game_name,
+        "frontend_index": _artifact_rel(dist_dir.parent, frontend_index),
+        "maths_index": _artifact_rel(dist_dir.parent, maths_index),
+        "maths_report": _artifact_rel(dist_dir.parent, maths_report),
+        "checks": {},
+    }
+
+    if not frontend_index.exists():
+        issues.append("Frontend distribution is missing dist/frontend/index.html")
+    else:
+        frontend_html = frontend_index.read_text(encoding="utf-8")
+        title_match = re.search(r"<title>(.*?)</title>", frontend_html, re.IGNORECASE | re.DOTALL)
+        title = title_match.group(1).strip() if title_match else ""
+        report["checks"]["frontend_title"] = title
+        if not title:
+            issues.append("Frontend distribution does not contain a <title> tag")
+        elif game_name not in title:
+            issues.append(f"Frontend distribution title does not match game name '{game_name}'")
+
+    index_payload: dict[str, object] | None = None
+    if not maths_index.exists():
+        issues.append("Math distribution is missing dist/maths/index.json")
+    else:
+        index_payload = json.loads(maths_index.read_text(encoding="utf-8"))
+        report["checks"]["maths_index_game"] = index_payload.get("game")
+        report["checks"]["maths_index_entry"] = index_payload.get("entry")
+        report["checks"]["maths_index_files"] = index_payload.get("files")
+
+        if index_payload.get("game") != game_name:
+            issues.append(f"Math index game name does not match '{game_name}'")
+
+        entry = index_payload.get("entry")
+        files = index_payload.get("files")
+
+        if not isinstance(entry, str) or not entry:
+            issues.append("Math index is missing a valid entry file")
+        elif not (maths_dir / entry).exists():
+            issues.append(f"Math index entry file is missing: {entry}")
+
+        if not isinstance(files, list) or not files:
+            issues.append("Math index is missing the files list")
+        else:
+            if isinstance(entry, str) and entry not in files:
+                issues.append("Math index entry file is not listed in files[]")
+            for file_name in files:
+                if not isinstance(file_name, str) or not file_name:
+                    issues.append("Math index contains an invalid file reference")
+                    continue
+                if not (maths_dir / file_name).exists():
+                    issues.append(f"Math index references a missing file: {file_name}")
+
+    report_payload: dict[str, object] | None = None
+    if not maths_report.exists():
+        issues.append("Math distribution is missing dist/maths/math_report.json")
+    else:
+        report_payload = json.loads(maths_report.read_text(encoding="utf-8"))
+        report["checks"]["math_report_game"] = report_payload.get("game")
+        report["checks"]["math_report_configuration_compliant"] = report_payload.get("configuration_compliant")
+        if report_payload.get("game") != game_name:
+            issues.append(f"Math report game name does not match '{game_name}'")
+
+    if index_payload is not None and report_payload is not None:
+        if index_payload.get("configuration_compliant") != report_payload.get("configuration_compliant"):
+            issues.append("Math index and math report disagree on configuration_compliant")
+
+    report["status"] = "passed" if not issues else "blocked"
+    report["issues"] = issues.copy()
+    return issues, report
 
 
 def _write_text(path: Path, content: str) -> None:
@@ -320,10 +421,10 @@ def _build_submission_document(
     )
 
 
-def _package_release(dist_dir: Path) -> Path:
+def _package_release(dist_dir: Path, game_name: str) -> Path:
     releases_dir = dist_dir / "submission" / "releases"
     releases_dir.mkdir(parents=True, exist_ok=True)
-    zip_path = releases_dir / "stake-game-template-artifacts.zip"
+    zip_path = releases_dir / f"{_slugify_artifact_name(game_name)}-artifacts.zip"
 
     with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for path in sorted(dist_dir.rglob("*")):
@@ -539,70 +640,6 @@ def run_pipeline(repo_root: Path) -> PipelineResult:
     _write_agent_report(dist_dir, stake_assures_result)
     pipeline_issues.extend(stake_assures_issues)
 
-    provisional_status = "passed" if not pipeline_issues else "blocked"
-    submission_path = dist_dir / "submission" / "stake_us_submission.md"
-    _write_text(
-        submission_path,
-        _build_submission_document(
-            requirements_content=requirements_content,
-            action_content=action_content,
-            math_report=math_report,
-            frontend_content=frontend_content,
-            build_status=provisional_status,
-            issues=pipeline_issues,
-        ),
-    )
-    content_result = AgentExecutionResult(
-        agent="content-writer",
-        status="passed" if provisional_status == "passed" else "blocked",
-        summary="Compiled the Stake.US submission draft from concept, UI, math, QA, and compliance inputs.",
-        issues=pipeline_issues.copy(),
-        artifacts=[_artifact_rel(repo_root, submission_path)],
-    )
-    agent_results.append(content_result)
-    _write_agent_report(dist_dir, content_result)
-
-    release_zip = dist_dir / "submission" / "releases" / "stake-game-template-artifacts.zip"
-    devops_result = AgentExecutionResult(
-        agent="devops-agent",
-        status="passed",
-        summary="Packaged the generated artifacts into a review-ready release archive.",
-        artifacts=[_artifact_rel(repo_root, release_zip)],
-    )
-    agent_results.append(devops_result)
-    _write_agent_report(dist_dir, devops_result)
-
-    final_status = "passed" if not pipeline_issues else "blocked"
-    director_report_path = dist_dir / "submission" / "system" / "director_report.md"
-    _write_text(
-        director_report_path,
-        "\n".join(
-            [
-                "# Director Report",
-                "",
-                f"Overall status: {final_status.upper()}",
-                "",
-                "## Sequence",
-                *[f"- {agent_name}" for agent_name in ORCHESTRATION_ORDER],
-                "",
-                "## Agent Statuses",
-                *[f"- {result.agent}: {result.status}" for result in agent_results],
-                "",
-                "## Issues",
-                *(["- None"] if not pipeline_issues else [f"- {issue}" for issue in pipeline_issues]),
-            ]
-        ),
-    )
-    director_result = AgentExecutionResult(
-        agent="StakeDirector",
-        status=final_status,
-        summary="Reviewed the full orchestrated run, validated agent outputs, and prepared the final status report.",
-        issues=pipeline_issues.copy(),
-        artifacts=[_artifact_rel(repo_root, director_report_path)],
-    )
-    agent_results.append(director_result)
-    _write_agent_report(dist_dir, director_result)
-
     _write_text(
         dist_dir / "submission" / "requirements_audit.md",
         "\n".join(
@@ -645,6 +682,80 @@ def run_pipeline(repo_root: Path) -> PipelineResult:
         ),
     )
     _write_json(dist_dir / "maths" / "math_report.json", math_report)
+    _write_json(dist_dir / "maths" / "index.json", _build_math_index(math_report))
+
+    dist_validation_issues, dist_validation_report = _validate_distribution_contract(
+        dist_dir=dist_dir,
+        game_name=parser_result["parsed"]["game_name"],
+    )
+    pipeline_issues.extend(dist_validation_issues)
+    dist_validation_path = dist_dir / "submission" / "system" / "dist_validation_report.json"
+    _write_json(dist_validation_path, dist_validation_report)
+
+    final_status = "passed" if not pipeline_issues else "blocked"
+    submission_path = dist_dir / "submission" / "stake_us_submission.md"
+    _write_text(
+        submission_path,
+        _build_submission_document(
+            requirements_content=requirements_content,
+            action_content=action_content,
+            math_report=math_report,
+            frontend_content=frontend_content,
+            build_status=final_status,
+            issues=pipeline_issues,
+        ),
+    )
+    content_result = AgentExecutionResult(
+        agent="content-writer",
+        status=final_status,
+        summary="Compiled the Stake.US submission draft from concept, UI, math, QA, compliance, and dist validation inputs.",
+        issues=pipeline_issues.copy(),
+        artifacts=[_artifact_rel(repo_root, submission_path)],
+    )
+    agent_results.append(content_result)
+    _write_agent_report(dist_dir, content_result)
+
+    release_zip = _package_release(dist_dir, parser_result["parsed"]["game_name"])
+    devops_result = AgentExecutionResult(
+        agent="devops-agent",
+        status="passed" if not dist_validation_issues else "blocked",
+        summary="Validated the frontend and maths upload contract and packaged the completed dist tree.",
+        issues=dist_validation_issues.copy(),
+        artifacts=[_artifact_rel(repo_root, release_zip), _artifact_rel(repo_root, dist_validation_path)],
+    )
+    agent_results.append(devops_result)
+    _write_agent_report(dist_dir, devops_result)
+
+    director_report_path = dist_dir / "submission" / "system" / "director_report.md"
+    _write_text(
+        director_report_path,
+        "\n".join(
+            [
+                "# Director Report",
+                "",
+                f"Overall status: {final_status.upper()}",
+                "",
+                "## Sequence",
+                *[f"- {agent_name}" for agent_name in ORCHESTRATION_ORDER],
+                "",
+                "## Agent Statuses",
+                *[f"- {result.agent}: {result.status}" for result in agent_results],
+                "",
+                "## Issues",
+                *(["- None"] if not pipeline_issues else [f"- {issue}" for issue in pipeline_issues]),
+            ]
+        ),
+    )
+    director_result = AgentExecutionResult(
+        agent="StakeDirector",
+        status=final_status,
+        summary="Reviewed the full orchestrated run, validated agent outputs, and prepared the final status report.",
+        issues=pipeline_issues.copy(),
+        artifacts=[_artifact_rel(repo_root, director_report_path)],
+    )
+    agent_results.append(director_result)
+    _write_agent_report(dist_dir, director_result)
+
     _write_json(dist_dir / "submission" / "system" / "orchestration_summary.json", [asdict(result) for result in agent_results])
 
     _write_json(
@@ -656,6 +767,7 @@ def run_pipeline(repo_root: Path) -> PipelineResult:
             "open_blockers": open_blockers,
             "artifacts": {
                 "agent_inventory": "dist/submission/system/agent_inventory.json",
+                "math_index": "dist/maths/index.json",
                 "math_report": "dist/maths/math_report.json",
                 "frontend_bundle": "dist/frontend/index.html",
                 "requirements_audit": "dist/submission/requirements_audit.md",
@@ -675,13 +787,12 @@ def run_pipeline(repo_root: Path) -> PipelineResult:
         },
     )
 
-    release_zip = _package_release(dist_dir)
-
     return PipelineResult(
         status=final_status,
         issues=pipeline_issues,
         artifacts={
             "agent_inventory": "dist/submission/system/agent_inventory.json",
+            "math_index": "dist/maths/index.json",
             "math_report": "dist/maths/math_report.json",
             "frontend_bundle": "dist/frontend/index.html",
             "requirements_audit": "dist/submission/requirements_audit.md",

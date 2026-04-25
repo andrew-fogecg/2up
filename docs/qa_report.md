@@ -1,4 +1,4 @@
-# QA Report — Dead Men's Doubloons (Two-Up)
+# QA Report — HeadsOrTails (Two-Up)
 **Date:** 2026-04-24  
 **Tester:** Stake QA (Automated)  
 **Build:** frontend/src — TwoUpGame.js, main.js, style.css, index.html

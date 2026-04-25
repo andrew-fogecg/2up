@@ -1,4 +1,4 @@
-# Stake Requirements: Stake Game Template Blueprint
+# Stake Requirements: HeadsOrTails
 
 ## 1. Game Concept
 - **Target Audience:** Internal game teams building Stake Engine-ready titles with AI-assisted automation.
@@ -20,6 +20,7 @@
 
 ## 4. Artifact Outputs
 - `dist/frontend/index.html`
+- `dist/maths/index.json`
 - `dist/maths/math_report.json`
 - `dist/submission/assumptions_draft.md`
 - `dist/submission/generated_spec.md`

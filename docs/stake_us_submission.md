@@ -1,4 +1,4 @@
-# Stake.US Submission — Dead Men's Doubloons
+# Stake.US Submission — HeadsOrTails
 
 **Submitted:** 2026-04-24  
 **Build Status:** PASSED  
@@ -10,7 +10,7 @@
 
 | Field | Value |
 |---|---|
-| **Official Game Name** | Dead Men's Doubloons |
+| **Official Game Name** | HeadsOrTails |
 | **Tagline** | *Come in, Spinner — if ye dare.* |
 | **Genre** | Coin-toss / Two-Up |
 | **Engine** | Stake Engine |
@@ -24,7 +24,7 @@
 
 ### Theme Description
 
-Dead Men's Doubloons is a pirate-themed digital adaptation of Two-Up, Australia's iconic colonial coin-toss game. Players wager inside a torchlit treasure cavern. A one-eyed Pirate Captain serves as the Boxer, managing rounds and calling the action. Two ancient gold doubloons — bearing a crowned skull on HEADS and crossed cutlasses on TAILS — are launched from a driftwood kip. Players bet on the outcome before each toss.
+HeadsOrTails is a pirate-themed digital adaptation of Two-Up, Australia's iconic colonial coin-toss game. Players wager inside a torchlit treasure cavern. A one-eyed Pirate Captain serves as the Boxer, managing rounds and calling the action. Two ancient gold doubloons — bearing a crowned skull on HEADS and crossed cutlasses on TAILS — are launched from a driftwood kip. Players bet on the outcome before each toss.
 
 The game distils Two-Up into three clean bet types — HEADS, TAILS, and FIVE ODDS — and runs entirely client-side with no external service dependencies.
 
@@ -113,7 +113,7 @@ A counter in the game UI displays the current consecutive ODDS count for the act
 
 ## 4. Social Mode Compliance
 
-Dead Men's Doubloons supports both Gold Coin (GC) and Sweeps Coin (SC) play modes in full compliance with Stake.US social casino standards.
+HeadsOrTails supports both Gold Coin (GC) and Sweeps Coin (SC) play modes in full compliance with Stake.US social casino standards.
 
 ### Currency Display Rules
 
@@ -145,7 +145,7 @@ A GC/SC mode toggle is visible at all times in the top navigation bar. Switching
 
 ## 5. Provably Fair
 
-Dead Men's Doubloons uses the **HMAC-SHA256** provably fair system consistent with Stake Engine standards.
+HeadsOrTails uses the **HMAC-SHA256** provably fair system consistent with Stake Engine standards.
 
 ### How It Works
 
@@ -179,7 +179,7 @@ After each round, the unhashed server seed is revealed. Players can verify every
 
 ## 6. Legal Disclaimer
 
-> **Dead Men's Doubloons** is a social casino game available on Stake.US. No real-money wagering occurs. Gold Coins (GC) and Sweeps Coins (SC) have no cash value and cannot be exchanged for currency except as permitted under Stake.US Sweepstakes Rules.
+> **HeadsOrTails** is a social casino game available on Stake.US. No real-money wagering occurs. Gold Coins (GC) and Sweeps Coins (SC) have no cash value and cannot be exchanged for currency except as permitted under Stake.US Sweepstakes Rules.
 >
 > Play is intended for players aged 18 and over (19+ in Alabama and Nebraska). Void where prohibited by law.
 >

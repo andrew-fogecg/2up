@@ -105,7 +105,7 @@ Key files currently include:
 - `dist/submission/system/frontend_test_report.json`
 - `dist/submission/system/qa_report.json`
 - `dist/submission/system/stake_assures_report.json`
-- `dist/submission/releases/stake-game-template-artifacts.zip`
+- `dist/submission/releases/headsortails-artifacts.zip`
 
 ## Requirements Parser
 

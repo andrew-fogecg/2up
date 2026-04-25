@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { captureReviewStep } from './review-helper.js';
 
 const MICRO_UNITS = 1_000_000;
-const REPLAY_STORAGE_KEY = 'dmd-replays-v1';
+const REPLAY_STORAGE_KEY = 'headsortails-replays-v1';
 const INITIAL_BALANCE = '1000 GC';
 
 const stakeCases = [
@@ -111,7 +111,7 @@ test('sound toggle persists for the session across reload', async ({ page }, tes
 test('replay mode loads stored event data and exposes replay-again control', async ({ page }, testInfo) => {
   const replayPayload = {
     eventId: 'EVT-HEADS-1',
-    sessionID: 'DMD-TEST-SESSION',
+    sessionID: 'HOT-TEST-SESSION',
     round: 7,
     startBalance: 100 * MICRO_UNITS,
     betType: 'HEADS',
