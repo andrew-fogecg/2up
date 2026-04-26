@@ -51,7 +51,14 @@ export default class SoundEngine {
    * @returns {Promise<void>}
    */
   async init() {
-    if (this._ready) return;
+    if (this._ready) {
+      if (this._ctx?.state === 'suspended') {
+        void this._ctx.resume().catch(() => {
+          // Browsers may still require a user gesture; do not block gameplay.
+        });
+      }
+      return;
+    }
 
     const Ctx = window.AudioContext || window.webkitAudioContext;
     if (!Ctx) {
@@ -66,12 +73,14 @@ export default class SoundEngine {
     this._masterGain.gain.setValueAtTime(this._volume, this._ctx.currentTime);
     this._masterGain.connect(this._ctx.destination);
 
-    // Resume if suspended (required on some browsers after page load)
-    if (this._ctx.state === 'suspended') {
-      await this._ctx.resume();
-    }
-
     this._ready = true;
+
+    // Resume if suspended when possible, but do not block non-gesture flows.
+    if (this._ctx.state === 'suspended') {
+      void this._ctx.resume().catch(() => {
+        // Audio will resume on the next permitted user gesture.
+      });
+    }
   }
 
   // ─────────────────────────────────────────────

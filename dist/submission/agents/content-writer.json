@@ -1,7 +1,7 @@
 {
   "agent": "content-writer",
   "status": "passed",
-  "summary": "Compiled the Stake.US submission draft from concept, UI, math, QA, and compliance inputs.",
+  "summary": "Compiled the Stake.US submission draft from concept, UI, math, QA, compliance, and dist validation inputs.",
   "issues": [],
   "artifacts": [
     "dist/submission/stake_us_submission.md"

@@ -139,20 +139,83 @@ def _write_json(path: Path, payload: dict | list) -> None:
     path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 
 
-def _build_math_index(math_report: dict[str, object]) -> dict[str, object]:
-    return {
-        "format": "stake-engine-maths",
-        "version": 1,
-        "game": math_report["game"],
-        "entry": "math_report.json",
-        "files": [
-            "index.json",
-            "math_report.json",
-            "developer_summary.md",
-        ],
-        "configuration_compliant": math_report["configuration_compliant"],
-        "mode_names": [mode["name"] for mode in math_report["mode_reports"]],
-    }
+def _build_math_rows(mode_report: dict[str, object]) -> tuple[list[dict[str, object]], list[str]]:
+    total_weight = 1_000_000_000_000
+    estimated_rtp = float(mode_report["estimated_rtp"])
+    max_win_multiplier = int(mode_report["max_win_multiplier"])
+    max_win_hit_rate = float(mode_report["max_win_hit_rate"])
+
+    jackpot_multiplier_int = max_win_multiplier * 100
+    regular_multiplier_int = 200 if jackpot_multiplier_int > 200 else 100
+    jackpot_weight = max(1, round(total_weight * max_win_hit_rate))
+
+    target_payout_units = estimated_rtp * total_weight
+    jackpot_payout_units = jackpot_weight * (jackpot_multiplier_int / 100)
+    regular_weight = round((target_payout_units - jackpot_payout_units) / (regular_multiplier_int / 100))
+    regular_weight = max(0, min(total_weight - jackpot_weight, regular_weight))
+    loss_weight = total_weight - jackpot_weight - regular_weight
+
+    events = [
+        {
+            "id": 1,
+            "events": [{"type": "result", "outcome": "LOSS"}],
+            "payoutMultiplier": 0,
+        },
+        {
+            "id": 2,
+            "events": [{"type": "result", "outcome": "WIN"}],
+            "payoutMultiplier": regular_multiplier_int,
+        },
+        {
+            "id": 3,
+            "events": [{"type": "result", "outcome": "MAX_WIN"}],
+            "payoutMultiplier": jackpot_multiplier_int,
+        },
+    ]
+    weights = [
+        f"1,{loss_weight},0",
+        f"2,{regular_weight},{regular_multiplier_int}",
+        f"3,{jackpot_weight},{jackpot_multiplier_int}",
+    ]
+    return events, weights
+
+
+def _write_stake_math_artifacts(output_dir: Path, math_report: dict[str, object]) -> dict[str, object]:
+    modes = []
+
+    for mode_report in math_report["mode_reports"]:
+        mode_name = str(mode_report["name"])
+        events_rows, weight_rows = _build_math_rows(mode_report)
+
+        jsonl_path = output_dir / f"books_{mode_name}.jsonl"
+        events_path = output_dir / f"books_{mode_name}.jsonl.zst"
+        weights_path = output_dir / f"lookUpTable_{mode_name}_0.csv"
+
+        jsonl_path.write_text("".join(json.dumps(row) + "\n" for row in events_rows), encoding="utf-8")
+        weights_path.write_text("\n".join(weight_rows) + "\n", encoding="utf-8")
+
+        compress_result = subprocess.run(
+            ["zstd", "-q", "-f", str(jsonl_path), "-o", str(events_path)],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if compress_result.returncode != 0:
+            raise RuntimeError(compress_result.stderr.strip() or compress_result.stdout.strip() or "zstd compression failed")
+        jsonl_path.unlink(missing_ok=True)
+
+        modes.append(
+            {
+                "name": mode_name,
+                "cost": float(mode_report["cost"]),
+                "events": events_path.name,
+                "weights": weights_path.name,
+            }
+        )
+
+    index_payload = {"modes": modes}
+    _write_json(output_dir / "index.json", index_payload)
+    return index_payload
 
 
 def _slugify_artifact_name(value: str) -> str:
@@ -194,32 +257,34 @@ def _validate_distribution_contract(
         issues.append("Math distribution is missing dist/maths/index.json")
     else:
         index_payload = json.loads(maths_index.read_text(encoding="utf-8"))
-        report["checks"]["maths_index_game"] = index_payload.get("game")
-        report["checks"]["maths_index_entry"] = index_payload.get("entry")
-        report["checks"]["maths_index_files"] = index_payload.get("files")
+        modes = index_payload.get("modes")
+        report["checks"]["maths_index_modes"] = modes
 
-        if index_payload.get("game") != game_name:
-            issues.append(f"Math index game name does not match '{game_name}'")
-
-        entry = index_payload.get("entry")
-        files = index_payload.get("files")
-
-        if not isinstance(entry, str) or not entry:
-            issues.append("Math index is missing a valid entry file")
-        elif not (maths_dir / entry).exists():
-            issues.append(f"Math index entry file is missing: {entry}")
-
-        if not isinstance(files, list) or not files:
-            issues.append("Math index is missing the files list")
+        if not isinstance(modes, list) or not modes:
+            issues.append("Math index is missing the modes list")
         else:
-            if isinstance(entry, str) and entry not in files:
-                issues.append("Math index entry file is not listed in files[]")
-            for file_name in files:
-                if not isinstance(file_name, str) or not file_name:
-                    issues.append("Math index contains an invalid file reference")
+            for mode in modes:
+                if not isinstance(mode, dict):
+                    issues.append("Math index contains an invalid mode entry")
                     continue
-                if not (maths_dir / file_name).exists():
-                    issues.append(f"Math index references a missing file: {file_name}")
+
+                mode_name = mode.get("name")
+                events_file = mode.get("events")
+                weights_file = mode.get("weights")
+                cost = mode.get("cost")
+
+                if not isinstance(mode_name, str) or not mode_name:
+                    issues.append("Math index mode is missing a valid name")
+                if not isinstance(cost, (int, float)):
+                    issues.append(f"Math index mode '{mode_name or 'unknown'}' is missing a numeric cost")
+                if not isinstance(events_file, str) or not events_file:
+                    issues.append(f"Math index mode '{mode_name or 'unknown'}' is missing an events file")
+                elif not (maths_dir / events_file).exists():
+                    issues.append(f"Math index mode '{mode_name or 'unknown'}' references a missing events file: {events_file}")
+                if not isinstance(weights_file, str) or not weights_file:
+                    issues.append(f"Math index mode '{mode_name or 'unknown'}' is missing a weights file")
+                elif not (maths_dir / weights_file).exists():
+                    issues.append(f"Math index mode '{mode_name or 'unknown'}' references a missing weights file: {weights_file}")
 
     report_payload: dict[str, object] | None = None
     if not maths_report.exists():
@@ -232,8 +297,15 @@ def _validate_distribution_contract(
             issues.append(f"Math report game name does not match '{game_name}'")
 
     if index_payload is not None and report_payload is not None:
-        if index_payload.get("configuration_compliant") != report_payload.get("configuration_compliant"):
-            issues.append("Math index and math report disagree on configuration_compliant")
+        expected_mode_names = sorted(mode["name"] for mode in report_payload.get("mode_reports", []))
+        actual_mode_names = sorted(
+            mode.get("name")
+            for mode in index_payload.get("modes", [])
+            if isinstance(mode, dict) and isinstance(mode.get("name"), str)
+        )
+        report["checks"]["maths_report_mode_names"] = expected_mode_names
+        if actual_mode_names != expected_mode_names:
+            issues.append("Math index mode names do not match math report mode names")
 
     report["status"] = "passed" if not issues else "blocked"
     report["issues"] = issues.copy()
@@ -321,6 +393,25 @@ def _run_frontend_tests(frontend_dir: Path) -> tuple[list[str], dict[str, object
         issues.append("Playwright browser installation failed")
         result_info["browser_output"] = install_browser.stderr.strip() or install_browser.stdout.strip()
         return issues, result_info
+
+    lsof_path = shutil.which("lsof")
+    if lsof_path is not None:
+        port_scan = subprocess.run(
+            [lsof_path, "-ti:4193"],
+            cwd=frontend_dir,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        pids = [pid.strip() for pid in port_scan.stdout.splitlines() if pid.strip()]
+        if pids:
+            subprocess.run(
+                ["kill", "-9", *pids],
+                cwd=frontend_dir,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
 
     test_result = subprocess.run(
         [npm_path, "run", "test:e2e"],
@@ -426,13 +517,22 @@ def _package_release(dist_dir: Path, game_name: str) -> Path:
     releases_dir.mkdir(parents=True, exist_ok=True)
     zip_path = releases_dir / f"{_slugify_artifact_name(game_name)}-artifacts.zip"
 
+    publish_roots = {
+        "frontend": "front",
+        "maths": "math",
+    }
+
     with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
-        for path in sorted(dist_dir.rglob("*")):
-            if not path.is_file():
+        for source_root, archive_root in publish_roots.items():
+            root_dir = dist_dir / source_root
+            if not root_dir.exists():
                 continue
-            if path == zip_path:
-                continue
-            archive.write(path, path.relative_to(dist_dir))
+
+            for path in sorted(root_dir.rglob("*")):
+                if not path.is_file():
+                    continue
+
+                archive.write(path, Path(archive_root) / path.relative_to(root_dir))
 
     return zip_path
 
@@ -682,7 +782,7 @@ def run_pipeline(repo_root: Path) -> PipelineResult:
         ),
     )
     _write_json(dist_dir / "maths" / "math_report.json", math_report)
-    _write_json(dist_dir / "maths" / "index.json", _build_math_index(math_report))
+    _write_stake_math_artifacts(dist_dir / "maths", math_report)
 
     dist_validation_issues, dist_validation_report = _validate_distribution_contract(
         dist_dir=dist_dir,

@@ -1,5 +1,5 @@
 {
-  "game": "Stake Game Template Blueprint",
+  "game": "HeadsOrTails",
   "mechanic_profile": {
     "key": "reel-line",
     "title": "Reel Spin Line Wins",

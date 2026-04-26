@@ -1,4 +1,4 @@
-# Assumptions Draft: Stake Game Template Blueprint
+# Assumptions Draft: HeadsOrTails
 
 These assumptions were generated from the current requirements before build execution.
 

@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "name": "Stake Game Template Blueprint",
+    "name": "HeadsOrTails",
     "target_audience": "Internal game teams building Stake Engine-ready titles with AI-assisted automation.",
     "icon_concept": "A modern deck-and-circuit emblem that communicates game logic, math, and automated delivery.",
     "rng": "Must use Provably Fair system."

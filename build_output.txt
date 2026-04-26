@@ -1,0 +1,16 @@
+Pipeline status: blocked
+- agent_inventory: dist/submission/system/agent_inventory.json
+- math_index: dist/maths/index.json
+- math_report: dist/maths/math_report.json
+- frontend_bundle: dist/frontend/index.html
+- requirements_audit: dist/submission/requirements_audit.md
+- action_summary: dist/submission/action_summary.md
+- stake_us_submission: dist/submission/stake_us_submission.md
+- release_package: dist/submission/releases/headsortails-artifacts.zip
+- director_report: dist/submission/system/director_report.md
+- generated_spec: dist/submission/generated_spec.md
+- game_spec_json: dist/submission/spec/game_spec.json
+- assumptions_draft: dist/submission/assumptions_draft.md
+- art_manifest: frontend/src/content/generatedArtManifest.json
+Issues:
+- Frontend browser tests failed

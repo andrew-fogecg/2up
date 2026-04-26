@@ -1,9 +1,10 @@
 {
   "agent": "devops-agent",
   "status": "passed",
-  "summary": "Packaged the generated artifacts into a review-ready release archive.",
+  "summary": "Validated the frontend and maths upload contract and packaged the completed dist tree.",
   "issues": [],
   "artifacts": [
-    "dist/submission/releases/stake-game-template-artifacts.zip"
+    "dist/submission/releases/headsortails-artifacts.zip",
+    "dist/submission/system/dist_validation_report.json"
   ]
 }

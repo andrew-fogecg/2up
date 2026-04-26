@@ -4,6 +4,7 @@
 
 /* ── Design tokens ──────────────────────────────────────────── */
 :root {
+  --app-height: 100dvh;
   --treasure-gold:  #FFD700;
   --doubloon-amber: #C8860A;
   --dark-oak:       #2C1A0E;
@@ -12,6 +13,9 @@
   --fog-white:      #F5ECD7;
   --blood-red:      #8B0000;
   --kelp-green:     #2D5016;
+  --gameboard-image: none;
+  --ui-font:        'Avenir Next', 'Gill Sans', 'Trebuchet MS', sans-serif;
+  --numeric-font:   'Avenir Next Demi Bold', 'Avenir Next', 'Gill Sans', sans-serif;
 
   --coin-size: 130px;
   font-family: Georgia, 'Times New Roman', serif;
@@ -21,9 +25,14 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
+html,
+body {
+  height: var(--app-height);
+}
+
 body {
   margin: 0;
-  min-height: 100vh;
+  min-height: var(--app-height);
   overflow-x: hidden;
   background: var(--sea-shadow);
 }
@@ -31,8 +40,15 @@ body {
 /* ── Cavern Background ───────────────────────────────────────── */
 .game-root {
   position: relative;
-  min-height: 100vh;
+  min-height: var(--app-height);
+  height: var(--app-height);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
   overflow: hidden;
+}
+
+.small-screen-nav {
+  display: none;
 }
 
 .cavern-bg {
@@ -229,20 +245,38 @@ body {
   flex-wrap: wrap;
 }
 
+.header-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .balance-display {
-  font-family: 'Pirata One', cursive;
-  font-size: 1.4rem;
+  font-family: var(--numeric-font);
+  font-size: 1.32rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  font-variant-numeric: lining-nums tabular-nums;
+  line-height: 1;
   color: var(--treasure-gold);
   background: rgba(0,0,0,0.45);
   border: 1px solid rgba(255,215,0,0.25);
   border-radius: 12px;
-  padding: 6px 18px;
+  padding: 8px 18px;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.65);
 }
 
 .session-id {
-  font-size: 0.72rem;
+  font-family: var(--ui-font);
+  font-size: 0.76rem;
   color: var(--fog-white);
   opacity: 0.55;
+  max-width: 360px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* ── Main game layout ────────────────────────────────────────── */
@@ -250,12 +284,130 @@ body {
   position: relative;
   z-index: 20;
   display: grid;
-  grid-template-columns: 280px 1fr 280px;
-  gap: 16px;
-  max-width: 1340px;
+  grid-template-columns: 236px minmax(0, 1fr) 236px;
+  gap: 20px;
+  max-width: 1480px;
   margin: 0 auto;
   padding: 0 16px 16px;
+  width: 100%;
+  min-height: 0;
   align-items: start;
+}
+
+@media (min-width: 981px) and (max-height: 820px) {
+  :root {
+    --coin-size: 118px;
+  }
+
+  .game-header {
+    padding: 10px 16px 8px;
+  }
+
+  .balance-bar {
+    gap: 12px;
+  }
+
+  .header-controls {
+    gap: 8px;
+  }
+
+  .balance-display {
+    font-size: 1.18rem;
+    padding: 7px 16px;
+  }
+
+  .sound-toggle {
+    padding: 8px 14px;
+  }
+
+  .game-layout {
+    grid-template-columns: 196px minmax(0, 1fr) 196px;
+    gap: 12px;
+    max-width: 1440px;
+    padding: 0 14px 10px;
+  }
+
+  .betting-panel,
+  .voyage-log-panel {
+    padding: 14px 12px;
+  }
+
+  .voyage-log-panel {
+    max-height: 72vh;
+  }
+
+  .betting-panel {
+    gap: 14px;
+  }
+
+  .bet-btn {
+    padding: 10px;
+  }
+
+  .bet-btn-icon {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+  }
+
+  .bet-btn-icon--pair {
+    width: 54px;
+    min-width: 54px;
+  }
+
+  .bet-btn-icon--pair img {
+    width: 34px;
+    height: 34px;
+  }
+
+  .bet-btn-icon--pair img:first-child,
+  .bet-btn-icon--pair img:last-child {
+    top: 5px;
+  }
+
+  .bet-btn-label {
+    font-size: 1.02rem;
+  }
+
+  .bet-btn-count {
+    font-size: 1.28rem;
+  }
+
+  .quick-btn {
+    padding: 4px 4px;
+  }
+
+  .odds-streak-section {
+    padding: 10px;
+  }
+
+  .spin-arena {
+    gap: 10px;
+    padding: 4px 0;
+  }
+
+  .gameboard {
+    width: min(720px, 100%);
+  }
+
+  .result-banner {
+    min-height: 44px;
+  }
+
+  .play-btn {
+    min-width: 240px;
+    padding: 12px 28px;
+    font-size: 1.1rem;
+  }
+
+  .game-footer {
+    margin-top: 0.45rem;
+    padding: 0.35rem 1rem;
+  }
+
+  .malfunction-notice {
+    font-size: 0.6rem;
+  }
 }
 
 /* ── Voyage Log Panel (right column) ────────────────────────── */
@@ -266,15 +418,10 @@ body {
   padding: 16px 14px 14px;
   backdrop-filter: blur(10px);
   align-self: start;
-  max-height: 80vh;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(200,134,10,0.4) transparent;
+  overflow: hidden;
+  min-height: 0;
+  box-sizing: border-box;
 }
-
-.voyage-log-panel::-webkit-scrollbar { width: 4px; }
-.voyage-log-panel::-webkit-scrollbar-track { background: transparent; }
-.voyage-log-panel::-webkit-scrollbar-thumb { background: rgba(200,134,10,0.4); border-radius: 4px; }
 
 .voyage-log-title {
   font-family: Georgia, 'Times New Roman', serif;
@@ -306,12 +453,14 @@ body {
 }
 
 .voyage-log-panel .history-round {
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: var(--numeric-font);
   font-size: 0.88rem;
   font-weight: 700;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 .voyage-log-panel .history-bet {
+  font-family: var(--ui-font);
   font-size: 0.9rem;
   font-weight: 700;
   line-height: 1.2;
@@ -337,9 +486,11 @@ body {
 .voyage-log-panel .history-balance { display: none; }
 
 .voyage-log-panel .history-profit {
+  font-family: var(--numeric-font);
   font-size: 0.78rem;
   text-align: right;
   align-self: start;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 .voyage-log-panel .history-empty {
@@ -360,6 +511,15 @@ body {
   flex-direction: column;
   gap: 18px;
   align-self: start;
+  overflow: hidden;
+  min-height: 0;
+  box-sizing: border-box;
+}
+
+.betting-panel > *,
+.voyage-log-panel > *,
+.small-screen-page > * {
+  min-width: 0;
 }
 
 .panel-title {
@@ -392,7 +552,7 @@ body {
   color: var(--fog-white);
   cursor: pointer;
   transition: all 0.2s ease;
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: var(--ui-font);
   font-size: 1.05rem;
 }
 
@@ -490,7 +650,7 @@ body {
 
 .bet-btn-label {
   min-width: 0;
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: var(--ui-font);
   font-size: clamp(1rem, 2.5vw, 1.28rem);
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -510,8 +670,10 @@ body {
 }
 
 .bet-btn-count {
+  font-family: var(--numeric-font);
   font-size: 1.5rem;
   color: var(--treasure-gold);
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 .bet-btn-copy {
@@ -528,9 +690,11 @@ body {
 }
 
 .bet-btn-odds {
+  font-family: var(--numeric-font);
   font-size: 0.78rem;
   opacity: 0.6;
   white-space: nowrap;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 .bet-btn--odds .bet-btn-odds {
@@ -553,7 +717,7 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.1em;
   opacity: 0.8;
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: var(--ui-font);
   font-weight: 700;
 }
 
@@ -569,16 +733,17 @@ body {
   border: 1px solid rgba(200,134,10,0.4);
   border-radius: 8px;
   color: var(--fog-white);
-  font-family: Georgia, serif;
+  font-family: var(--numeric-font);
   font-size: 1.1rem;
   padding: 8px 10px;
   outline: none;
   transition: border-color 0.2s;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 .stake-input:focus { border-color: var(--treasure-gold); }
 
 .stake-currency-label {
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: var(--numeric-font);
   font-weight: 700;
   color: var(--treasure-gold);
   font-size: 1rem;
@@ -597,7 +762,7 @@ body {
   border: 1px solid rgba(255,215,0,0.2);
   border-radius: 6px;
   color: var(--treasure-gold);
-  font-family: 'Pirata One', cursive;
+  font-family: var(--numeric-font);
   font-size: 0.8rem;
   padding: 5px 4px;
   cursor: pointer;
@@ -611,7 +776,12 @@ body {
   font-size: 0.85rem;
 }
 .potential-win-label { opacity: 0.6; }
-.potential-win-value { color: var(--treasure-gold); font-family: 'Pirata One', cursive; }
+.potential-win-value {
+  color: var(--treasure-gold);
+  font-family: var(--numeric-font);
+  font-variant-numeric: lining-nums tabular-nums;
+  letter-spacing: 0.04em;
+}
 
 /* ── Odds streak / skull tracker ────────────────────────────── */
 .odds-streak-section {
@@ -654,7 +824,8 @@ body {
 .odds-count-display {
   font-size: 0.78rem;
   opacity: 0.55;
-  font-family: 'Pirata One', cursive;
+  font-family: var(--numeric-font);
+  font-variant-numeric: lining-nums tabular-nums;
 }
 .odds-count-display.danger { color: #ff4444; opacity: 1; }
 
@@ -676,23 +847,25 @@ body {
 .seed-info { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
 .seed-row  { display: flex; flex-direction: column; gap: 3px; }
 .seed-row label { font-size: 0.78rem; opacity: 0.75; text-transform: uppercase; letter-spacing: 0.1em; }
-.seed-value { font-size: 0.8rem; word-break: break-all; color: var(--treasure-gold); opacity: 0.85; }
+.seed-value { font-size: 0.8rem; word-break: break-all; color: var(--treasure-gold); opacity: 0.85; font-family: var(--numeric-font); font-variant-numeric: lining-nums tabular-nums; }
 .seed-input {
   background: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.14);
   border-radius: 6px;
   color: var(--fog-white);
+  font-family: var(--numeric-font);
   font-size: 0.8rem;
   padding: 5px 8px;
   outline: none;
   width: 100%;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 .seed-btn {
   background: rgba(255,215,0,0.1);
   border: 1px solid rgba(255,215,0,0.25);
   border-radius: 6px;
   color: var(--treasure-gold);
-  font-family: 'Pirata One', cursive;
+  font-family: var(--ui-font);
   font-size: 0.85rem;
   padding: 6px 10px;
   cursor: pointer;
@@ -705,7 +878,7 @@ body {
   border: 1px solid rgba(255,215,0,0.25);
   border-radius: 8px;
   color: var(--treasure-gold);
-  font-family: 'Pirata One', cursive;
+  font-family: var(--ui-font);
   font-size: 0.95rem;
   padding: 10px 12px;
   cursor: pointer;
@@ -715,6 +888,60 @@ body {
 .info-btn:hover {
   background: rgba(255,215,0,0.2);
   transform: translateY(-1px);
+}
+
+.header-controls .provably-fair {
+  position: relative;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.header-controls .provably-fair summary,
+.header-controls .info-btn,
+.header-controls .sound-toggle {
+  min-height: 42px;
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-family: var(--ui-font);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.header-controls .provably-fair summary {
+  display: inline-flex;
+  align-items: center;
+  list-style: none;
+  border: 1px solid rgba(255,215,0,0.18);
+  background: rgba(255,255,255,0.06);
+  color: var(--fog-white);
+  padding-inline: 16px;
+}
+
+.header-controls .provably-fair summary::-webkit-details-marker {
+  display: none;
+}
+
+.header-controls .provably-fair[open] summary {
+  background: rgba(255,215,0,0.14);
+  color: var(--treasure-gold);
+}
+
+.header-controls .provably-fair .seed-info {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: min(340px, calc(100vw - 24px));
+  margin-top: 0;
+  padding: 14px;
+  border: 1px solid rgba(255,215,0,0.18);
+  border-radius: 16px;
+  background: rgba(20,10,4,0.96);
+  box-shadow: 0 16px 34px rgba(0,0,0,0.36);
+  backdrop-filter: blur(14px);
+  z-index: 35;
 }
 
 .rules-backdrop {
@@ -811,6 +1038,7 @@ body {
   gap: 16px;
   padding: 10px 0;
   position: relative;
+  min-height: 0;
 }
 
 /* ── Captain ─────────────────────────────────────────────────── */
@@ -928,10 +1156,10 @@ body {
 
 .gameboard {
   position: relative;
-  width: min(560px, 98vw);
+  width: min(760px, 100%);
   /* image is ~1100×940 */
   aspect-ratio: 1100 / 940;
-  background: url('/assets/gameboardpng.png') center / contain no-repeat;
+  background: var(--gameboard-image) center / contain no-repeat;
 }
 
 .replay-banner {
@@ -979,7 +1207,7 @@ body {
   border-radius: 999px;
   background: rgba(255,215,0,0.14);
   color: var(--treasure-gold);
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: var(--ui-font);
   font-weight: 700;
   padding: 10px 14px;
   cursor: pointer;
@@ -1060,7 +1288,7 @@ body {
 }
 
 .result-text {
-  font-family: 'IM Fell English', serif;
+  font-family: var(--numeric-font);
   font-size: clamp(1.6rem, 4vw, 2.6rem);
   letter-spacing: 0.12em;
   opacity: 0;
@@ -1083,11 +1311,12 @@ body {
 
 /* ── Toss counter ────────────────────────────────────────────── */
 .toss-counter {
-  font-family: 'Pirata One', cursive;
+  font-family: var(--numeric-font);
   font-size: 0.9rem;
   color: var(--fog-white);
   opacity: 0.5;
   letter-spacing: 0.1em;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 /* ── Play button ─────────────────────────────────────────────── */
@@ -1105,7 +1334,7 @@ body {
   border: 2px solid var(--treasure-gold);
   border-radius: 12px;
   color: var(--fog-white);
-  font-family: 'Pirata One', cursive;
+  font-family: var(--ui-font);
   font-size: 1.3rem;
   letter-spacing: 0.08em;
   cursor: pointer;
@@ -1136,7 +1365,7 @@ body {
   font-size: 0.65rem;
   opacity: 0.45;
   margin-top: 2px;
-  font-family: 'IM Fell English', serif;
+  font-family: var(--numeric-font);
 }
 
 .error-message {
@@ -1171,6 +1400,305 @@ body {
   gap: 6px;
 }
 
+@media (min-width: 901px) and (max-height: 760px) {
+  :root {
+    --coin-size: 86px;
+  }
+
+  .game-header {
+    padding: 8px 12px 6px;
+  }
+
+  .balance-bar {
+    gap: 10px;
+  }
+
+  .balance-display {
+    font-size: 1.02rem;
+    padding: 6px 12px;
+  }
+
+  .sound-toggle {
+    padding: 8px 12px;
+  }
+
+  .session-id {
+    font-size: 0.68rem;
+  }
+
+  .game-layout {
+    grid-template-columns: 186px 1fr 186px;
+    gap: 10px;
+    max-width: 1280px;
+    padding: 0 10px 8px;
+  }
+
+  .betting-panel,
+  .voyage-log-panel {
+    padding: 10px 9px 12px;
+  }
+
+  .betting-panel {
+    gap: 10px;
+  }
+
+  .panel-title,
+  .voyage-log-title {
+    font-size: 0.86rem;
+    margin-bottom: 0;
+  }
+
+  .bet-type-selector {
+    gap: 7px;
+  }
+
+  .bet-btn {
+    gap: 8px;
+    padding: 7px 8px;
+  }
+
+  .bet-btn-icon {
+    width: 34px;
+    min-width: 34px;
+    height: 34px;
+  }
+
+  .bet-btn-icon--pair {
+    width: 42px;
+    min-width: 42px;
+  }
+
+  .bet-btn-icon--pair img {
+    width: 24px;
+    height: 24px;
+  }
+
+  .bet-btn-icon--pair img:first-child,
+  .bet-btn-icon--pair img:last-child {
+    top: 4px;
+  }
+
+  .bet-btn-label {
+    font-size: 0.86rem;
+  }
+
+  .bet-btn-count {
+    font-size: 1.02rem;
+  }
+
+  .bet-btn-odds,
+  .bet-btn--odds .bet-btn-odds {
+    font-size: 0.62rem;
+  }
+
+  .stake-section {
+    gap: 6px;
+  }
+
+  .stake-label {
+    font-size: 0.72rem;
+  }
+
+  .stake-input {
+    font-size: 0.92rem;
+    padding: 6px 8px;
+  }
+
+  .stake-currency-label {
+    font-size: 0.82rem;
+  }
+
+  .quick-stakes {
+    gap: 4px;
+  }
+
+  .quick-btn {
+    min-width: 0;
+    font-size: 0.66rem;
+    padding: 4px 2px;
+  }
+
+  .potential-win-row {
+    font-size: 0.72rem;
+  }
+
+  .odds-streak-section {
+    padding: 8px;
+    gap: 6px;
+  }
+
+  .odds-streak-title {
+    font-size: 0.74rem;
+  }
+
+  .skulls-row {
+    gap: 5px;
+  }
+
+  .skull-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .odds-count-display {
+    font-size: 0.66rem;
+  }
+
+  .provably-fair {
+    padding: 8px;
+    font-size: 0.72rem;
+  }
+
+  .provably-fair summary,
+  .seed-btn,
+  .info-btn {
+    font-size: 0.74rem;
+  }
+
+  .seed-info {
+    margin-top: 8px;
+    gap: 5px;
+  }
+
+  .seed-row label,
+  .seed-value,
+  .seed-input {
+    font-size: 0.68rem;
+  }
+
+  .seed-input {
+    padding: 4px 6px;
+  }
+
+  .seed-btn,
+  .info-btn {
+    padding: 6px 8px;
+  }
+
+  .spin-arena {
+    gap: 8px;
+    padding: 4px 0 6px;
+  }
+
+  .gameboard {
+    width: min(540px, 100%);
+  }
+
+  .result-banner {
+    min-height: 30px;
+  }
+
+  .result-text {
+    font-size: clamp(1rem, 2.4vw, 1.4rem);
+  }
+
+  .toss-counter {
+    font-size: 0.72rem;
+  }
+
+  .play-btn-wrapper {
+    gap: 4px;
+  }
+
+  .play-btn {
+    min-width: 196px;
+    padding: 9px 16px;
+    font-size: 0.92rem;
+  }
+
+  .spacebar-hint {
+    display: none;
+  }
+
+  .voyage-log-panel .history-list {
+    gap: 5px;
+  }
+
+  .voyage-log-panel .history-entry {
+    grid-template-columns: 28px minmax(0, 1fr) auto;
+    gap: 4px 6px;
+    padding: 6px 7px;
+    font-size: 0.68rem;
+  }
+
+  .voyage-log-panel .history-round,
+  .voyage-log-panel .history-bet,
+  .voyage-log-panel .history-profit {
+    font-size: 0.7rem;
+  }
+
+  .voyage-log-panel .history-tosses {
+    font-size: 0.58rem;
+  }
+
+  .game-footer {
+    padding: 0.28rem 0.8rem;
+  }
+
+  .malfunction-notice {
+    font-size: 0.56rem;
+  }
+}
+
+@media (min-width: 901px) and (max-height: 640px) {
+  .game-layout {
+    grid-template-columns: 210px 1fr 210px;
+  }
+
+  .gameboard {
+    width: min(280px, 36vw);
+  }
+
+  .betting-panel,
+  .voyage-log-panel {
+    padding: 8px 7px 10px;
+  }
+
+  .betting-panel {
+    gap: 8px;
+  }
+
+  .quick-stakes {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    display: grid;
+  }
+
+  .stake-input-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .stake-input,
+  .stake-section,
+  .quick-stakes,
+  .quick-btn {
+    min-width: 0;
+  }
+
+  .quick-btn {
+    font-size: 0.62rem;
+    padding: 4px 1px;
+  }
+
+  .play-btn {
+    min-width: 176px;
+    padding: 8px 14px;
+  }
+
+  .bet-btn,
+  .bet-btn--odds {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas: "icon label";
+  }
+
+  .bet-btn-odds,
+  .bet-btn--odds .bet-btn-odds {
+    display: none;
+  }
+}
+
 .history-empty {
   font-style: italic;
   opacity: 0.4;
@@ -1195,14 +1723,15 @@ body {
 .history-entry--visible { opacity: 1; transform: translateY(0); }
 
 .history-round { color: var(--treasure-gold); font-family: 'Pirata One', cursive; }
-.history-outcome { text-align: center; border-radius: 6px; padding: 2px 6px; font-size: 0.75rem; font-family: 'Pirata One', cursive; }
+.history-round { color: var(--treasure-gold); font-family: var(--numeric-font); font-variant-numeric: lining-nums tabular-nums; }
+.history-outcome { text-align: center; border-radius: 6px; padding: 2px 6px; font-size: 0.75rem; font-family: var(--ui-font); }
 .outcome-heads  { background: rgba(255,215,0,0.15); color: var(--treasure-gold); }
 .outcome-tails  { background: rgba(160,180,200,0.15); color: #a0b4c8; }
 .outcome-odds   { background: rgba(168,85,247,0.15); color: #c084fc; }
 .outcome-odded  { background: rgba(255,68,68,0.15); color: #ff6b6b; }
 
-.profit-positive { color: #6fcf97; font-family: 'Pirata One', cursive; }
-.profit-negative { color: #eb5757; font-family: 'Pirata One', cursive; }
+.profit-positive { color: #6fcf97; font-family: var(--numeric-font); font-variant-numeric: lining-nums tabular-nums; }
+.profit-negative { color: #eb5757; font-family: var(--numeric-font); font-variant-numeric: lining-nums tabular-nums; }
 .history-balance { opacity: 0.55; text-align: right; }
 .history-tosses  { font-size: 0.78rem; opacity: 0.7; }
 
@@ -1282,7 +1811,7 @@ body {
 }
 
 /* ── Responsive ─────────────────────────────────────────────── */
-@media (max-width: 1100px) {
+@media (max-width: 1000px) {
   .game-layout {
     grid-template-columns: 260px 1fr;
   }
@@ -1303,6 +1832,11 @@ body {
   .balance-bar {
     justify-content: space-between;
     gap: 10px 12px;
+  }
+
+  .header-controls {
+    width: 100%;
+    justify-content: center;
   }
 
   .session-id {
@@ -1459,13 +1993,737 @@ body {
   }
 }
 
+@media (max-width: 900px) {
+  body {
+    overflow: hidden;
+  }
+
+  .game-root {
+    min-height: var(--app-height);
+    height: var(--app-height);
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
+    overflow: hidden;
+  }
+
+  .ship-silhouette,
+  .parrot-zone {
+    display: none;
+  }
+
+  .game-header {
+    padding: 10px 10px 8px;
+  }
+
+  .balance-bar {
+    gap: 8px 10px;
+    justify-content: space-between;
+  }
+
+  .header-controls {
+    width: 100%;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .balance-display,
+  .sound-toggle {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .header-controls .provably-fair,
+  .header-controls .info-btn {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .header-controls .provably-fair summary,
+  .header-controls .info-btn,
+  .header-controls .sound-toggle {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .session-id {
+    order: 3;
+    width: 100%;
+    max-width: none;
+    text-align: center;
+  }
+
+  .game-layout {
+    display: flex;
+    gap: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .game-layout::-webkit-scrollbar {
+    display: none;
+  }
+
+  .small-screen-page {
+    flex: 0 0 100%;
+    width: 100%;
+    min-width: 100%;
+    min-height: 0;
+    height: 100%;
+    scroll-snap-align: start;
+    overflow: hidden;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  .betting-panel,
+  .spin-arena,
+  .voyage-log-panel {
+    border-radius: 0;
+    border-left: 0;
+    border-right: 0;
+    border-top: 0;
+    width: 100%;
+    max-width: none;
+    overflow: hidden;
+  }
+
+  .betting-panel,
+  .voyage-log-panel {
+    padding: 14px 14px 16px;
+  }
+
+  .spin-arena {
+    padding: 10px 12px 14px;
+    justify-content: flex-start;
+  }
+
+  .captain-zone {
+    display: none;
+  }
+
+  .gameboard {
+    width: min(100%, 520px);
+  }
+
+  .play-btn-wrapper {
+    width: 100%;
+    margin-top: auto;
+  }
+
+  .play-btn {
+    min-width: min(100%, 320px);
+  }
+
+  .voyage-log-panel {
+    max-height: none;
+  }
+
+  .small-screen-nav {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+    background: rgba(13, 8, 3, 0.96);
+    border-top: 1px solid rgba(255,215,0,0.12);
+    box-shadow: 0 -10px 24px rgba(0,0,0,0.32);
+    z-index: 30;
+  }
+
+  .small-screen-nav-btn {
+    border: 1px solid rgba(255,215,0,0.18);
+    border-radius: 999px;
+    background: rgba(255,255,255,0.06);
+    color: rgba(245,236,215,0.82);
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 0.88rem;
+    font-weight: 700;
+    padding: 10px 8px;
+    cursor: pointer;
+  }
+
+  .small-screen-nav-btn.active {
+    background: rgba(255,215,0,0.16);
+    color: var(--treasure-gold);
+    border-color: rgba(255,215,0,0.36);
+    box-shadow: 0 0 0 1px rgba(255,215,0,0.12) inset;
+  }
+
+  .game-footer {
+    margin-top: 0;
+    padding: 0.35rem 0.75rem;
+  }
+
+  .malfunction-notice {
+    font-size: 0.58rem;
+  }
+}
+
+@media (max-width: 900px) and (max-height: 500px) and (orientation: landscape) {
+  :root {
+    --coin-size: 84px;
+  }
+
+  .game-header {
+    padding: 6px 10px 5px;
+  }
+
+  .balance-bar {
+    gap: 6px 8px;
+    flex-wrap: nowrap;
+  }
+
+  .header-controls {
+    width: auto;
+  }
+
+  .header-controls .provably-fair,
+  .header-controls .info-btn {
+    display: none;
+  }
+
+  .balance-display {
+    font-size: 1rem;
+    padding: 6px 12px;
+  }
+
+  .sound-toggle {
+    padding: 7px 10px;
+    font-size: 0.84rem;
+  }
+
+  .session-id {
+    font-size: 0.62rem;
+  }
+
+  .betting-panel,
+  .voyage-log-panel {
+    padding: 10px 12px 12px;
+  }
+
+  .betting-panel {
+    gap: 12px;
+  }
+
+  .bet-type-selector {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .bet-btn,
+  .bet-btn--odds {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "icon"
+      "label"
+      "odds";
+    justify-items: center;
+    text-align: center;
+    gap: 4px;
+    padding: 6px 4px;
+  }
+
+  .bet-btn-label--mismatch {
+    align-items: center;
+  }
+
+  .bet-btn--odds .bet-btn-odds {
+    justify-self: center;
+  }
+
+  .panel-title,
+  .voyage-log-title {
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+  }
+
+  .bet-btn {
+    padding: 8px 10px;
+  }
+
+  .bet-btn-icon {
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+  }
+
+  .bet-btn-icon--pair {
+    width: 48px;
+    min-width: 48px;
+  }
+
+  .bet-btn-icon--pair img {
+    width: 30px;
+    height: 30px;
+  }
+
+  .bet-btn-icon--pair img:first-child,
+  .bet-btn-icon--pair img:last-child {
+    top: 5px;
+  }
+
+  .bet-btn-label {
+    font-size: 0.94rem;
+  }
+
+  .bet-btn-count {
+    font-size: 1.15rem;
+  }
+
+  .stake-input {
+    font-size: 1rem;
+    padding: 7px 9px;
+  }
+
+  .quick-btn {
+    padding: 4px 4px;
+    font-size: 0.72rem;
+  }
+
+  .odds-streak-section {
+    padding: 10px;
+  }
+
+  .skull-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .spin-arena {
+    gap: 8px;
+    padding: 8px 10px 10px;
+  }
+
+  .gameboard {
+    width: min(100%, 360px);
+  }
+
+  .result-banner {
+    min-height: 38px;
+  }
+
+  .result-text {
+    font-size: clamp(1.1rem, 3vw, 1.5rem);
+  }
+
+  .play-btn {
+    min-width: min(100%, 220px);
+    padding: 10px 18px;
+    font-size: 0.98rem;
+  }
+
+  .spacebar-hint {
+    display: none;
+  }
+
+  .voyage-log-panel .history-entry {
+    padding: 8px 8px 7px;
+    font-size: 0.72rem;
+  }
+
+  .voyage-log-panel .history-bet {
+    font-size: 0.82rem;
+  }
+
+  .voyage-log-panel .history-tosses {
+    font-size: 0.62rem;
+  }
+
+  .small-screen-nav {
+    padding-top: 6px;
+    padding-bottom: calc(6px + env(safe-area-inset-bottom));
+  }
+
+  .small-screen-nav-btn {
+    font-size: 0.78rem;
+    padding: 8px 6px;
+  }
+}
+
+@media (max-width: 460px) and (max-height: 260px) {
+  :root {
+    --coin-size: 64px;
+  }
+
+  .game-header {
+    padding: 4px 8px 3px;
+  }
+
+  .balance-bar {
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .balance-display,
+  .sound-toggle {
+    width: auto;
+    min-width: 0;
+    flex: 0 1 auto;
+    white-space: nowrap;
+  }
+
+  /* Collapse header-controls to a single inline item (sound only) */
+  .header-controls {
+    width: auto;
+    flex-wrap: nowrap;
+  }
+
+  .header-controls .provably-fair,
+  .header-controls .info-btn {
+    display: none;
+  }
+
+  .header-controls .sound-toggle {
+    width: auto;
+    flex: 0 1 auto;
+    min-height: 0;
+    height: auto;
+    padding: 4px 8px;
+    white-space: nowrap;
+  }
+
+  .session-id {
+    display: none;
+  }
+
+  .game-header {
+    padding: 4px 8px;
+  }
+
+  .balance-display {
+    font-size: 0.9rem;
+    padding: 5px 10px;
+  }
+
+  .sound-toggle {
+    padding: 6px 8px;
+    font-size: 0.72rem;
+  }
+
+  .betting-panel,
+  .voyage-log-panel,
+  .spin-arena {
+    padding: 2px 8px;
+  }
+
+  .betting-panel {
+    gap: 4px;
+  }
+
+  .panel-title,
+  .voyage-log-title {
+    display: none;
+  }
+
+  .bet-btn {
+    grid-template-columns: 34px minmax(0, 1fr) auto;
+    gap: 4px;
+    padding: 4px 5px;
+  }
+
+  .bet-btn-icon {
+    width: 24px;
+    min-width: 24px;
+    height: 24px;
+  }
+
+  .bet-btn-icon--pair {
+    width: 28px;
+    min-width: 28px;
+  }
+
+  .bet-btn-icon--pair img {
+    width: 16px;
+    height: 16px;
+  }
+
+  .bet-btn-icon--pair img:first-child,
+  .bet-btn-icon--pair img:last-child {
+    top: 4px;
+  }
+
+  .bet-btn-label {
+    font-size: 0.68rem;
+  }
+
+  .bet-btn-odds {
+    display: none;
+  }
+
+  .bet-btn-count {
+    font-size: 0.82rem;
+  }
+
+  .stake-section {
+    gap: 4px;
+  }
+
+  .stake-label {
+    display: none;
+  }
+
+  .stake-label,
+  .potential-win-row,
+  .odds-streak-title,
+  .odds-count-display,
+  .provably-fair summary,
+  .seed-btn,
+  .info-btn {
+    font-size: 0.7rem;
+  }
+
+  .stake-input {
+    font-size: 0.82rem;
+    padding: 4px 6px;
+  }
+
+  .stake-currency-label {
+    font-size: 0.72rem;
+  }
+
+  .quick-btn {
+    font-size: 0.58rem;
+    padding: 2px 1px;
+  }
+
+  .potential-win-row,
+  .odds-streak-section,
+  .provably-fair,
+  .info-btn {
+    display: none;
+  }
+
+  .odds-streak-section,
+  .provably-fair {
+    padding: 6px 7px;
+  }
+
+  .skulls-row {
+    gap: 4px;
+  }
+
+  .skull-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .gameboard {
+    width: min(100%, 96px);
+  }
+
+  .spin-arena {
+    gap: 2px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+  }
+
+  .result-banner {
+    min-height: 14px;
+  }
+
+  .result-text {
+    font-size: clamp(0.72rem, 3vw, 0.92rem);
+    letter-spacing: 0.04em;
+  }
+
+  .toss-counter,
+  .error-message {
+    display: none;
+  }
+
+  .play-btn-wrapper {
+    gap: 2px;
+  }
+
+  .play-btn {
+    min-width: min(100%, 132px);
+    padding: 5px 8px;
+    font-size: 0.7rem;
+  }
+
+  .small-screen-nav-btn {
+    font-size: 0.7rem;
+    padding: 6px 4px;
+  }
+
+  .game-footer {
+    display: none;
+  }
+}
+
+@media (max-width: 260px) and (max-height: 420px) {
+  :root {
+    --coin-size: 72px;
+  }
+
+  .game-header {
+    padding: 6px 8px 4px;
+  }
+
+  .balance-bar {
+    gap: 6px;
+    flex-wrap: nowrap;
+  }
+
+  .balance-display,
+  .sound-toggle {
+    font-size: 0.78rem;
+    padding: 5px 8px;
+  }
+
+  .header-controls {
+    width: auto;
+    flex-wrap: nowrap;
+  }
+
+  .header-controls .provably-fair,
+  .header-controls .info-btn {
+    display: none;
+  }
+
+  .header-controls .sound-toggle {
+    width: auto;
+    flex: 0 1 auto;
+    white-space: nowrap;
+    min-height: 0;
+    height: auto;
+    padding: 4px 8px;
+  }
+
+  .session-id,
+  .potential-win-row,
+  .odds-streak-section,
+  .provably-fair,
+  .info-btn,
+  .game-footer {
+    display: none;
+  }
+
+  .betting-panel,
+  .voyage-log-panel,
+  .spin-arena {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .betting-panel {
+    gap: 6px;
+    padding-top: 8px;
+    padding-bottom: 10px;
+  }
+
+  .bet-type-selector {
+    gap: 6px;
+  }
+
+  .bet-btn {
+    gap: 6px;
+    padding: 6px 7px;
+  }
+
+  .bet-btn-icon {
+    width: 30px;
+    min-width: 30px;
+    height: 30px;
+  }
+
+  .bet-btn-icon--pair {
+    width: 36px;
+    min-width: 36px;
+  }
+
+  .bet-btn-icon--pair img {
+    width: 22px;
+    height: 22px;
+  }
+
+  .bet-btn-label {
+    font-size: 0.76rem;
+  }
+
+  .bet-btn-count {
+    font-size: 0.94rem;
+  }
+
+  .bet-btn-odds {
+    font-size: 0.56rem;
+  }
+
+  .stake-section {
+    gap: 4px;
+  }
+
+  .stake-label,
+  .stake-currency-label,
+  .quick-btn,
+  .small-screen-nav-btn {
+    font-size: 0.68rem;
+  }
+
+  .stake-input {
+    font-size: 0.8rem;
+    padding: 5px 6px;
+  }
+
+  .quick-stakes {
+    gap: 4px;
+  }
+
+  .quick-btn {
+    padding: 3px 2px;
+  }
+
+  .spin-arena {
+    gap: 6px;
+    padding-top: 8px;
+    padding-bottom: 10px;
+  }
+
+  .gameboard {
+    width: min(100%, 150px);
+  }
+
+  .result-banner {
+    min-height: 28px;
+  }
+
+  .result-text {
+    font-size: clamp(0.92rem, 4.2vw, 1.12rem);
+    letter-spacing: 0.06em;
+  }
+
+  .toss-counter {
+    font-size: 0.62rem;
+  }
+
+  .play-btn {
+    min-width: min(100%, 160px);
+    padding: 7px 10px;
+    font-size: 0.78rem;
+  }
+}
+
 /* ── Footer disclaimer ───────────────────────────────────── */
 .game-footer {
   width: 100%;
   text-align: center;
   padding: 0.5rem 1rem;
   border-top: 1px solid rgba(200,134,10,0.25);
-  margin-top: 1rem;
+  margin-top: 0;
 }
 
 .malfunction-notice {

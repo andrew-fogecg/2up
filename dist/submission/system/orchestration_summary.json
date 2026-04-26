@@ -40,13 +40,13 @@
     "issues": [],
     "artifacts": [
       "dist/submission/docs/sound_map.json",
-      "frontend/public/assets/generated/stake-game-template-blueprint/icon.svg",
-      "frontend/public/assets/generated/stake-game-template-blueprint/symbol-l1.svg",
-      "frontend/public/assets/generated/stake-game-template-blueprint/symbol-l2.svg",
-      "frontend/public/assets/generated/stake-game-template-blueprint/symbol-h1.svg",
-      "frontend/public/assets/generated/stake-game-template-blueprint/symbol-h2.svg",
-      "frontend/public/assets/generated/stake-game-template-blueprint/symbol-w.svg",
-      "frontend/public/assets/generated/stake-game-template-blueprint/symbol-sc.svg"
+      "frontend/public/assets/generated/headsortails/icon.svg",
+      "frontend/public/assets/generated/headsortails/symbol-l1.svg",
+      "frontend/public/assets/generated/headsortails/symbol-l2.svg",
+      "frontend/public/assets/generated/headsortails/symbol-h1.svg",
+      "frontend/public/assets/generated/headsortails/symbol-h2.svg",
+      "frontend/public/assets/generated/headsortails/symbol-w.svg",
+      "frontend/public/assets/generated/headsortails/symbol-sc.svg"
     ]
   },
   {
@@ -71,7 +71,7 @@
   {
     "agent": "content-writer",
     "status": "passed",
-    "summary": "Compiled the Stake.US submission draft from concept, UI, math, QA, and compliance inputs.",
+    "summary": "Compiled the Stake.US submission draft from concept, UI, math, QA, compliance, and dist validation inputs.",
     "issues": [],
     "artifacts": [
       "dist/submission/stake_us_submission.md"
@@ -80,10 +80,11 @@
   {
     "agent": "devops-agent",
     "status": "passed",
-    "summary": "Packaged the generated artifacts into a review-ready release archive.",
+    "summary": "Validated the frontend and maths upload contract and packaged the completed dist tree.",
     "issues": [],
     "artifacts": [
-      "dist/submission/releases/stake-game-template-artifacts.zip"
+      "dist/submission/releases/headsortails-artifacts.zip",
+      "dist/submission/system/dist_validation_report.json"
     ]
   },
   {

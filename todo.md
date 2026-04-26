@@ -34,5 +34,5 @@
 - [x] Add replay-focused regression tests.
 	Cover `?replay=` handling, replay banner visibility, replay-again flow, URL override parsing, and replay keyboard restrictions.
 
-- [ ] Run a manual approval pass after replay and sound are complete.
-	Verify social wording, replay flow, sound toggle persistence, modal behavior, and current build output before moving on to RGS integration.
+- [x] Run a manual approval pass after replay and sound are complete.
+	Verified social wording, replay flow, sound toggle persistence, modal behavior, and current build output. Approval coverage now includes multiple bet amounts across desktop, tablet, mobile, and popout layouts in both portrait and landscape orientations.

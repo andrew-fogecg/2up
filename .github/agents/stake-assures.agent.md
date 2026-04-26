@@ -399,8 +399,10 @@ Run this checklist immediately before submitting or re-submitting to Stake Engin
 
 ### Code & Build
 - [ ] Front-end build is clean (no errors, no warnings)
-- [ ] `dist/front/` contains `index.html`, latest CSS hash, latest JS hash, all assets
+- [ ] Upload output is directory-based, never a zip archive
+- [ ] `dist/frontend/` contains `index.html`, latest CSS hash, latest JS hash, all assets
 - [ ] `dist/maths/` contains math output files
+- [ ] The handoff for upload is the `frontend` directory plus the `maths` directory
 - [ ] No hardcoded RGS or CDN URLs in source
 
 ### Stake Engine Dashboard

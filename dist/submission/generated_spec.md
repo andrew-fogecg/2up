@@ -1,4 +1,4 @@
-# Generated Specification: Stake Game Template Blueprint
+# Generated Specification: HeadsOrTails
 
 - Target audience: Internal game teams building Stake Engine-ready titles with AI-assisted automation.
 - Icon concept: A modern deck-and-circuit emblem that communicates game logic, math, and automated delivery.

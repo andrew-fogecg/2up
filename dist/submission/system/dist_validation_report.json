@@ -1,0 +1,31 @@
+{
+  "game_name": "HeadsOrTails",
+  "frontend_index": "dist/frontend/index.html",
+  "maths_index": "dist/maths/index.json",
+  "maths_report": "dist/maths/math_report.json",
+  "checks": {
+    "frontend_title": "HeadsOrTails",
+    "maths_index_modes": [
+      {
+        "name": "base",
+        "cost": 1.0,
+        "events": "books_base.jsonl.zst",
+        "weights": "lookUpTable_base_0.csv"
+      },
+      {
+        "name": "bonus",
+        "cost": 2.0,
+        "events": "books_bonus.jsonl.zst",
+        "weights": "lookUpTable_bonus_0.csv"
+      }
+    ],
+    "math_report_game": "HeadsOrTails",
+    "math_report_configuration_compliant": true,
+    "maths_report_mode_names": [
+      "base",
+      "bonus"
+    ]
+  },
+  "status": "passed",
+  "issues": []
+}

@@ -3,11 +3,32 @@ import SoundEngine from './audio/SoundEngine.js';
 import './style.css';
 
 const MICRO_UNITS = 1_000_000;
+const ASSET_BASE_URL = new URL('./assets/', window.location.href);
+
+function assetPath(fileName) {
+  return new URL(fileName, ASSET_BASE_URL).toString();
+}
+
+const COIN_HEADS_SRC = assetPath('coin-heads.png');
+const COIN_TAILS_SRC = assetPath('coin-tails.png');
+const GAMEBOARD_SRC = assetPath('gameboardpng.png');
+
 const sound = new SoundEngine();
-document.addEventListener('click', async () => {
-  await sound.init();
-  applySoundPreference();
-}, { once: true });
+let soundReadyPromise = null;
+
+async function ensureSoundReady() {
+  if (!soundReadyPromise) {
+    soundReadyPromise = sound.init().then(() => {
+      applySoundPreference();
+    });
+  }
+
+  await soundReadyPromise;
+}
+
+document.addEventListener('pointerdown', () => {
+  void ensureSoundReady();
+}, { once: true, capture: true });
 
 // --- Replay Context ---
 function getReplayContext() {
@@ -178,11 +199,35 @@ function buildSoundToggleHTML() {
   return `<button class="sound-toggle" id="sound-toggle" aria-pressed="false">SOUND ON</button>`;
 }
 
+function buildHeaderControlsHTML() {
+  return `
+    <div class="header-controls">
+      <details class="provably-fair provably-fair--header">
+        <summary>Fair Play</summary>
+        <div class="seed-info">
+          <div class="seed-row">
+            <label>Server Seed Hash:</label>
+            <span class="seed-value" id="server-seed-hash">Generating&hellip;</span>
+          </div>
+          <div class="seed-row">
+            <label>Client Seed:</label>
+            <input type="text" id="client-seed-input" class="seed-input"
+              maxlength="64" placeholder="Enter custom seed&hellip;" />
+          </div>
+          <button class="seed-btn" id="rotate-seed-btn">&#x1F504; Rotate Seeds</button>
+        </div>
+      </details>
+      <button class="info-btn info-btn--header" id="info-btn">&#x2139; Game Info</button>
+      ${buildSoundToggleHTML()}
+    </div>
+  `;
+}
+
 function buildBetIconHTML(betType) {
   if (betType === BetType.HEADS) {
     return `
       <span class="bet-btn-icon bet-btn-icon--coin" aria-hidden="true">
-        <img src="/assets/coin-heads.png" alt="" draggable="false" />
+        <img src="${COIN_HEADS_SRC}" alt="" draggable="false" />
       </span>
     `;
   }
@@ -190,15 +235,15 @@ function buildBetIconHTML(betType) {
   if (betType === BetType.TAILS) {
     return `
       <span class="bet-btn-icon bet-btn-icon--coin" aria-hidden="true">
-        <img src="/assets/coin-tails.png" alt="" draggable="false" />
+        <img src="${COIN_TAILS_SRC}" alt="" draggable="false" />
       </span>
     `;
   }
 
   return `
     <span class="bet-btn-icon bet-btn-icon--pair" aria-hidden="true">
-      <img src="/assets/coin-heads.png" alt="" draggable="false" />
-      <img src="/assets/coin-tails.png" alt="" draggable="false" />
+      <img src="${COIN_HEADS_SRC}" alt="" draggable="false" />
+      <img src="${COIN_TAILS_SRC}" alt="" draggable="false" />
     </span>
   `;
 }
@@ -441,13 +486,13 @@ function buildGameHTML(currency, balance, uiCopy) {
     <div class="balance-bar">
       <div class="balance-display">&#x1F4B0; <span id="balance-value">${formatDisplayUnits(balance, currency)}</span></div>
       <div class="session-id" id="session-display"></div>
-      ${buildSoundToggleHTML()}
+      ${buildHeaderControlsHTML()}
     </div>
   </header>
 
   <main class="game-layout">
 
-    <aside class="betting-panel">
+    <aside class="betting-panel small-screen-page" id="setup-page" data-page="0">
       <h2 class="panel-title">&#x2694;&#xFE0F; ${uiCopy.panelTitle}</h2>
 
       <div class="bet-type-selector" id="bet-type-selector">
@@ -495,26 +540,9 @@ function buildGameHTML(currency, balance, uiCopy) {
         <div class="odds-count-display" id="odds-count-display">0 of 5</div>
       </div>
 
-      <details class="provably-fair">
-        <summary>&#x1F512; Provably Fair</summary>
-        <div class="seed-info">
-          <div class="seed-row">
-            <label>Server Seed Hash:</label>
-            <span class="seed-value" id="server-seed-hash">Generating&hellip;</span>
-          </div>
-          <div class="seed-row">
-            <label>Client Seed:</label>
-            <input type="text" id="client-seed-input" class="seed-input"
-              maxlength="64" placeholder="Enter custom seed&hellip;" />
-          </div>
-          <button class="seed-btn" id="rotate-seed-btn">&#x1F504; Rotate Seeds</button>
-        </div>
-      </details>
-
-      <button class="info-btn" id="info-btn">&#x2139; Game Info</button>
     </aside>
 
-    <section class="spin-arena">
+    <section class="spin-arena small-screen-page" id="board-page" data-page="1">
 
       <div class="captain-zone" id="captain-zone">
         <div class="captain" id="captain">&#x1F3F4;&#x200D;&#x2620;&#xFE0F;</div>
@@ -529,13 +557,13 @@ function buildGameHTML(currency, balance, uiCopy) {
             <div class="coins-on-kip">
               <div class="coin" id="coin-1">
                 <div class="coin-inner" id="coin-1-inner">
-                  <div class="coin-face"><img class="coin-img" src="/assets/coin-heads.png" alt="" draggable="false"></div>
+                  <div class="coin-face"><img class="coin-img" src="${COIN_HEADS_SRC}" alt="" draggable="false"></div>
                 </div>
                 <div class="coin-shadow" id="coin-1-shadow"></div>
               </div>
               <div class="coin" id="coin-2">
                 <div class="coin-inner" id="coin-2-inner">
-                  <div class="coin-face"><img class="coin-img" src="/assets/coin-heads.png" alt="" draggable="false"></div>
+                  <div class="coin-face"><img class="coin-img" src="${COIN_HEADS_SRC}" alt="" draggable="false"></div>
                 </div>
                 <div class="coin-shadow" id="coin-2-shadow"></div>
               </div>
@@ -562,7 +590,7 @@ function buildGameHTML(currency, balance, uiCopy) {
 
     </section>
 
-    <aside class="voyage-log-panel">
+    <aside class="voyage-log-panel small-screen-page" id="results-page" data-page="2">
       <h3 class="voyage-log-title">&#x1F4DC; Voyage Log</h3>
       <div class="history-list" id="history-list">
         <div class="history-empty">No voyages yet, scallywag.</div>
@@ -570,6 +598,12 @@ function buildGameHTML(currency, balance, uiCopy) {
     </aside>
 
   </main>
+
+  <nav class="small-screen-nav" id="small-screen-nav" aria-label="Game screens">
+    <button class="small-screen-nav-btn active" data-page="0" aria-pressed="true">Setup</button>
+    <button class="small-screen-nav-btn" data-page="1" aria-pressed="false">Board</button>
+    <button class="small-screen-nav-btn" data-page="2" aria-pressed="false">Log</button>
+  </nav>
 
   <div class="screen-flash" id="screen-flash"></div>
 
@@ -608,12 +642,15 @@ if (replayCtx.language) {
 
 const app = document.getElementById('app');
 app.innerHTML = buildGameHTML(currency, startBal, uiCopy);
+document.documentElement.style.setProperty('--gameboard-image', `url("${GAMEBOARD_SRC}")`);
 
 // --- DOM refs ---
 const $ = id => document.getElementById(id);
 const el = {
   balance:         $('balance-value'),
   sessionDisp:     $('session-display'),
+  layout:          document.querySelector('.game-layout'),
+  smallScreenNav:  $('small-screen-nav'),
   soundToggle:     $('sound-toggle'),
   playBtn:         $('play-btn'),
   playBtnText:     $('play-btn-text'),
@@ -650,6 +687,8 @@ const el = {
   replayRepeatBtn: $('replay-repeat-btn'),
 };
 
+const smallScreenNavButtons = Array.from(document.querySelectorAll('.small-screen-nav-btn'));
+
 // --- State ---
 let selectedBet   = BetType.HEADS;
 let isSpinning    = false;
@@ -658,6 +697,7 @@ let pendingResult = null;
 let isRulesOpen   = false;
 let replayComplete = false;
 let isSoundMuted = window.sessionStorage.getItem(SOUND_STORAGE_KEY) === '1';
+let activeSmallScreenPage = 0;
 
 el.sessionDisp.textContent  = isReplayMode ? `Replay: ${replayRound.eventId}` : `Session: ${game.sessionID}`;
 el.clientSeedInput.value    = game.clientSeed;
@@ -761,6 +801,37 @@ function syncReplayUi() {
 function updateSoundToggle() {
   el.soundToggle.textContent = isSoundMuted ? 'SOUND OFF' : 'SOUND ON';
   el.soundToggle.setAttribute('aria-pressed', String(isSoundMuted));
+}
+
+function isSmallScreenLayout() {
+  return window.innerWidth <= 900;
+}
+
+function updateAppHeight() {
+  const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+  document.documentElement.style.setProperty('--app-height', `${Math.round(viewportHeight)}px`);
+}
+
+function updateSmallScreenNav(pageIndex) {
+  activeSmallScreenPage = pageIndex;
+  smallScreenNavButtons.forEach((button, index) => {
+    const isActive = index === pageIndex;
+    button.classList.toggle('active', isActive);
+    button.setAttribute('aria-pressed', String(isActive));
+  });
+}
+
+function scrollToSmallScreenPage(pageIndex, behavior = 'smooth') {
+  if (!el.layout || !isSmallScreenLayout()) return;
+  const left = el.layout.clientWidth * pageIndex;
+  el.layout.scrollTo({ left, behavior });
+  updateSmallScreenNav(pageIndex);
+}
+
+function syncSmallScreenPageFromScroll() {
+  if (!el.layout || !isSmallScreenLayout()) return;
+  const pageIndex = Math.round(el.layout.scrollLeft / Math.max(1, el.layout.clientWidth));
+  updateSmallScreenNav(pageIndex);
 }
 
 function applySoundPreference() {
@@ -918,7 +989,10 @@ function openChests() {
 }
 
 // --- Coin Animation ---
+const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 function delay(ms) {
+  if (REDUCED_MOTION) return Promise.resolve();
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -929,12 +1003,19 @@ async function flipOneCoin(inner, shadow, coinResult) {
   inner.getAnimations().forEach(a => a.cancel());
   shadow.getAnimations().forEach(a => a.cancel());
 
+  // In reduced-motion / headless test environments skip the Web Animations
+  // so anim.finished never hangs the round flow.
+  if (REDUCED_MOTION) {
+    imgEl.src = coinResult === 'H' ? COIN_HEADS_SRC : COIN_TAILS_SRC;
+    return;
+  }
+
   // Reset to heads so the coin looks neutral before it launches
-  imgEl.src = '/assets/coin-heads.png';
+  imgEl.src = COIN_HEADS_SRC;
 
   // Swap the image at the blurry arc-peak so the result is hidden until landing
   const swapTimer = setTimeout(() => {
-    imgEl.src = coinResult === 'H' ? '/assets/coin-heads.png' : '/assets/coin-tails.png';
+    imgEl.src = coinResult === 'H' ? COIN_HEADS_SRC : COIN_TAILS_SRC;
   }, DURATION * 0.48);
 
   // Both heads and tails always land at 1800deg (front-face forward — no backface needed)
@@ -957,7 +1038,7 @@ async function flipOneCoin(inner, shadow, coinResult) {
   await anim.finished;
   clearTimeout(swapTimer);
   // Guarantee correct face is shown after animation settles
-  imgEl.src = coinResult === 'H' ? '/assets/coin-heads.png' : '/assets/coin-tails.png';
+  imgEl.src = coinResult === 'H' ? COIN_HEADS_SRC : COIN_TAILS_SRC;
 }
 
 async function animateToss(toss) {
@@ -1022,6 +1103,9 @@ function addHistoryEntry(roundData) {
 async function runReplayRound() {
   if (!isReplayMode || isSpinning) return;
 
+  await ensureSoundReady();
+  scrollToSmallScreenPage(1);
+
   replayComplete = false;
   syncReplayUi();
   clearHistory();
@@ -1048,6 +1132,7 @@ async function runReplayRound() {
   updateBalance(replayRound.balance);
   await presentRoundOutcome(replayRound);
   addHistoryEntry(replayRound);
+  scrollToSmallScreenPage(2);
 
   replayComplete = true;
   syncReplayUi();
@@ -1069,6 +1154,8 @@ async function handlePlay() {
   }
   if (isSpinning) return;
 
+  await ensureSoundReady();
+
   const stakeVal = parseFloat(el.stakeInput.value);
   if (!stakeVal || stakeVal <= 0) {
     showError(uiCopy.invalidAmountError);
@@ -1079,6 +1166,8 @@ async function handlePlay() {
     showError(uiCopy.insufficientBalanceError);
     return;
   }
+
+  scrollToSmallScreenPage(1);
 
   tossBuffer    = [];
   pendingResult = null;
@@ -1121,6 +1210,7 @@ async function handlePlay() {
       currency,
       social: isSocialMode,
     });
+    scrollToSmallScreenPage(2);
   }
 
   el.tossCounter.style.display = 'none';
@@ -1134,27 +1224,57 @@ async function handlePlay() {
 }
 
 // --- Event wiring ---
-el.playBtn.addEventListener('click', () => { sound.buttonClick(); handlePlay(); });
-el.betSelector.addEventListener('click', () => sound.uiHover(), { capture: true });
+el.playBtn.addEventListener('click', async () => {
+  await ensureSoundReady();
+  sound.buttonClick();
+  await handlePlay();
+});
+el.betSelector.addEventListener('click', () => {
+  void ensureSoundReady().then(() => sound.uiHover());
+}, { capture: true });
 el.infoBtn.addEventListener('click', () => {
-  sound.uiHover();
+  void ensureSoundReady().then(() => sound.uiHover());
   openRulesModal();
 });
 el.rulesCloseBtn.addEventListener('click', closeRulesModal);
 el.rulesBackdrop.addEventListener('click', e => {
   if (e.target === el.rulesBackdrop) closeRulesModal();
 });
-el.replayRepeatBtn.addEventListener('click', () => {
+el.replayRepeatBtn.addEventListener('click', async () => {
+  await ensureSoundReady();
   sound.buttonClick();
-  runReplayRound();
+  await runReplayRound();
 });
 el.soundToggle.addEventListener('click', async () => {
-  await sound.init();
+  await ensureSoundReady();
   isSoundMuted = !isSoundMuted;
   window.sessionStorage.setItem(SOUND_STORAGE_KEY, isSoundMuted ? '1' : '0');
   applySoundPreference();
   updateSoundToggle();
 });
+
+smallScreenNavButtons.forEach(button => {
+  button.addEventListener('click', () => {
+    scrollToSmallScreenPage(Number(button.dataset.page ?? 0));
+  });
+});
+
+el.layout?.addEventListener('scroll', syncSmallScreenPageFromScroll, { passive: true });
+
+updateAppHeight();
+window.addEventListener('resize', () => {
+  updateAppHeight();
+  if (isSmallScreenLayout()) {
+    scrollToSmallScreenPage(activeSmallScreenPage, 'auto');
+  }
+});
+window.addEventListener('orientationchange', () => {
+  updateAppHeight();
+  if (isSmallScreenLayout()) {
+    setTimeout(() => scrollToSmallScreenPage(activeSmallScreenPage, 'auto'), 50);
+  }
+});
+window.visualViewport?.addEventListener('resize', updateAppHeight);
 
 document.addEventListener('keydown', e => {
   if (e.code === 'Escape' && isRulesOpen) {
@@ -1180,6 +1300,7 @@ if (isReplayMode) {
 
 updatePotentialWin();
 updateSoundToggle();
+updateSmallScreenNav(0);
 setCaptainMood('neutral');
 showCaptainSpeech(isReplayMode ? `Replay loaded: ${replayRound.eventId}` : uiCopy.idlePrompt, 3500);
 

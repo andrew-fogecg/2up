@@ -5,12 +5,13 @@
   "open_blockers": [],
   "artifacts": {
     "agent_inventory": "dist/submission/system/agent_inventory.json",
+    "math_index": "dist/maths/index.json",
     "math_report": "dist/maths/math_report.json",
     "frontend_bundle": "dist/frontend/index.html",
     "requirements_audit": "dist/submission/requirements_audit.md",
     "action_summary": "dist/submission/action_summary.md",
     "stake_us_submission": "dist/submission/stake_us_submission.md",
-    "release_package": "dist/submission/releases/stake-game-template-artifacts.zip",
+    "release_package": "dist/submission/releases/headsortails-artifacts.zip",
     "director_report": "dist/submission/system/director_report.md",
     "generated_spec": "dist/submission/generated_spec.md",
     "game_spec_json": "dist/submission/spec/game_spec.json",
@@ -70,13 +71,13 @@
       "issues": [],
       "artifacts": [
         "dist/submission/docs/sound_map.json",
-        "frontend/public/assets/generated/stake-game-template-blueprint/icon.svg",
-        "frontend/public/assets/generated/stake-game-template-blueprint/symbol-l1.svg",
-        "frontend/public/assets/generated/stake-game-template-blueprint/symbol-l2.svg",
-        "frontend/public/assets/generated/stake-game-template-blueprint/symbol-h1.svg",
-        "frontend/public/assets/generated/stake-game-template-blueprint/symbol-h2.svg",
-        "frontend/public/assets/generated/stake-game-template-blueprint/symbol-w.svg",
-        "frontend/public/assets/generated/stake-game-template-blueprint/symbol-sc.svg"
+        "frontend/public/assets/generated/headsortails/icon.svg",
+        "frontend/public/assets/generated/headsortails/symbol-l1.svg",
+        "frontend/public/assets/generated/headsortails/symbol-l2.svg",
+        "frontend/public/assets/generated/headsortails/symbol-h1.svg",
+        "frontend/public/assets/generated/headsortails/symbol-h2.svg",
+        "frontend/public/assets/generated/headsortails/symbol-w.svg",
+        "frontend/public/assets/generated/headsortails/symbol-sc.svg"
       ]
     },
     {
@@ -101,7 +102,7 @@
     {
       "agent": "content-writer",
       "status": "passed",
-      "summary": "Compiled the Stake.US submission draft from concept, UI, math, QA, and compliance inputs.",
+      "summary": "Compiled the Stake.US submission draft from concept, UI, math, QA, compliance, and dist validation inputs.",
       "issues": [],
       "artifacts": [
         "dist/submission/stake_us_submission.md"
@@ -110,10 +111,11 @@
     {
       "agent": "devops-agent",
       "status": "passed",
-      "summary": "Packaged the generated artifacts into a review-ready release archive.",
+      "summary": "Validated the frontend and maths upload contract and packaged the completed dist tree.",
       "issues": [],
       "artifacts": [
-        "dist/submission/releases/stake-game-template-artifacts.zip"
+        "dist/submission/releases/headsortails-artifacts.zip",
+        "dist/submission/system/dist_validation_report.json"
       ]
     },
     {
@@ -129,11 +131,11 @@
   "frontend": {
     "built": true,
     "artifact": "dist/frontend/index.html",
-    "build_output": "> stake-game-template-frontend@0.1.0 build\n> vite build\n\nvite v7.3.2 building client environment for production...\ntransforming...\n\u2713 8 modules transformed.\nrendering chunks...\ncomputing gzip size...\n../dist/frontend/index.html                 0.71 kB \u2502 gzip: 0.40 kB\n../dist/frontend/assets/index-BQpoCfAv.css  3.83 kB \u2502 gzip: 1.52 kB\n../dist/frontend/assets/index-BIys4W6V.js   9.24 kB \u2502 gzip: 3.27 kB\n\u2713 built in 57ms"
+    "build_output": "> headsortails-frontend@0.1.0 build\n> vite build\n\nvite v7.3.2 building client environment for production...\ntransforming...\n\u2713 6 modules transformed.\nrendering chunks...\ncomputing gzip size...\n../dist/frontend/index.html                  0.69 kB \u2502 gzip:  0.39 kB\n../dist/frontend/assets/index-BWu2hnx9.css  39.07 kB \u2502 gzip:  8.46 kB\n../dist/frontend/assets/index-DTIhdKQY.js   44.05 kB \u2502 gzip: 13.76 kB\n\u2713 built in 147ms"
   },
   "parser": {
     "parsed": {
-      "game_name": "Stake Game Template Blueprint",
+      "game_name": "HeadsOrTails",
       "target_audience": "Internal game teams building Stake Engine-ready titles with AI-assisted automation.",
       "icon_concept": "A modern deck-and-circuit emblem that communicates game logic, math, and automated delivery.",
       "core_mechanic": "5x3 reel-spin with line wins"
@@ -147,58 +149,58 @@
       "assumptions_draft": "dist/submission/assumptions_draft.md"
     },
     "generated_assets": [
-      "frontend/public/assets/generated/stake-game-template-blueprint/icon.svg",
-      "frontend/public/assets/generated/stake-game-template-blueprint/symbol-l1.svg",
-      "frontend/public/assets/generated/stake-game-template-blueprint/symbol-l2.svg",
-      "frontend/public/assets/generated/stake-game-template-blueprint/symbol-h1.svg",
-      "frontend/public/assets/generated/stake-game-template-blueprint/symbol-h2.svg",
-      "frontend/public/assets/generated/stake-game-template-blueprint/symbol-w.svg",
-      "frontend/public/assets/generated/stake-game-template-blueprint/symbol-sc.svg"
+      "frontend/public/assets/generated/headsortails/icon.svg",
+      "frontend/public/assets/generated/headsortails/symbol-l1.svg",
+      "frontend/public/assets/generated/headsortails/symbol-l2.svg",
+      "frontend/public/assets/generated/headsortails/symbol-h1.svg",
+      "frontend/public/assets/generated/headsortails/symbol-h2.svg",
+      "frontend/public/assets/generated/headsortails/symbol-w.svg",
+      "frontend/public/assets/generated/headsortails/symbol-sc.svg"
     ],
     "art_pipeline": {
       "manifest_path": "frontend/src/content/generatedArtManifest.json",
       "mode": "placeholder",
       "generated_assets": [
-        "frontend/public/assets/generated/stake-game-template-blueprint/icon.svg",
-        "frontend/public/assets/generated/stake-game-template-blueprint/symbol-l1.svg",
-        "frontend/public/assets/generated/stake-game-template-blueprint/symbol-l2.svg",
-        "frontend/public/assets/generated/stake-game-template-blueprint/symbol-h1.svg",
-        "frontend/public/assets/generated/stake-game-template-blueprint/symbol-h2.svg",
-        "frontend/public/assets/generated/stake-game-template-blueprint/symbol-w.svg",
-        "frontend/public/assets/generated/stake-game-template-blueprint/symbol-sc.svg"
+        "frontend/public/assets/generated/headsortails/icon.svg",
+        "frontend/public/assets/generated/headsortails/symbol-l1.svg",
+        "frontend/public/assets/generated/headsortails/symbol-l2.svg",
+        "frontend/public/assets/generated/headsortails/symbol-h1.svg",
+        "frontend/public/assets/generated/headsortails/symbol-h2.svg",
+        "frontend/public/assets/generated/headsortails/symbol-w.svg",
+        "frontend/public/assets/generated/headsortails/symbol-sc.svg"
       ],
       "active_assets": {
-        "icon": "/assets/generated/stake-game-template-blueprint/icon.svg",
+        "icon": "/assets/generated/headsortails/icon.svg",
         "symbols": [
           {
             "key": "L1",
             "label": "L1",
-            "src": "/assets/generated/stake-game-template-blueprint/symbol-l1.svg"
+            "src": "/assets/generated/headsortails/symbol-l1.svg"
           },
           {
             "key": "L2",
             "label": "L2",
-            "src": "/assets/generated/stake-game-template-blueprint/symbol-l2.svg"
+            "src": "/assets/generated/headsortails/symbol-l2.svg"
           },
           {
             "key": "H1",
             "label": "H1",
-            "src": "/assets/generated/stake-game-template-blueprint/symbol-h1.svg"
+            "src": "/assets/generated/headsortails/symbol-h1.svg"
           },
           {
             "key": "H2",
             "label": "H2",
-            "src": "/assets/generated/stake-game-template-blueprint/symbol-h2.svg"
+            "src": "/assets/generated/headsortails/symbol-h2.svg"
           },
           {
             "key": "W",
             "label": "W",
-            "src": "/assets/generated/stake-game-template-blueprint/symbol-w.svg"
+            "src": "/assets/generated/headsortails/symbol-w.svg"
           },
           {
             "key": "SC",
             "label": "SC",
-            "src": "/assets/generated/stake-game-template-blueprint/symbol-sc.svg"
+            "src": "/assets/generated/headsortails/symbol-sc.svg"
           }
         ]
       }
